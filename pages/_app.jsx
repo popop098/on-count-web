@@ -1,85 +1,83 @@
+import { DefaultSeo, WebSiteJsonLd } from 'next-seo';
+import SEO from '../next-seo.config.js';
 import "@/styles/globals.css";
-import {HeroUIProvider} from '@heroui/react'
-import {ThemeProvider as NextThemesProvider} from "next-themes";
-import {NavBarComp} from "@/components/NavBarComp";
-import { useEffect } from 'react';
-import useUserStore, {useUser} from '@/store/userStore';
-import HoverMenuBtn from "@/components/HoverMenuBtn";
-import NoticeMobileMode from "@/components/NoticeMobileMode";
-import localFont from 'next/font/local'
-import ContainerBox from "@/components/ContainerBox";
+import { HeroUIProvider } from "@heroui/react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { NavBarComp } from "@/components/NavBarComp";
+import { useEffect } from "react";
+import useUserStore, { useUser } from "@/store/userStore";
+import localFont from "next/font/local";
 import Image from "next/image";
 import OnCountLogo from "@/public/icon.png";
-import {Slide, ToastContainer} from "react-toastify";
 const pretendard = localFont({
-    src: '../public/fonts/pretendard/PretendardVariable.woff2',
-    display: 'swap',
-    weight: '100 900',
-    variable: '--font-pretendard',
-})
-export default function App({ Component, pageProps }) {
-  const { setUser } = useUserStore();
-  const user = useUser()
+  src: "../public/fonts/pretendard/PretendardVariable.woff2",
+  weight: "45 920",
+  variable: "--font-pretendard",
+});
+
+function MyApp({ Component, pageProps }) {
+  const setUser = useUserStore((state) => state.setUser);
+  const user = useUser();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch('/api/user');
-        if (res.ok) {
-          const user = await res.json();
-          setUser(user);
+        const accessToken = localStorage.getItem("accessToken");
+        if (accessToken) {
+          const response = await fetch("/api/user");
+          const data = await response.json();
+          setUser(data);
         }
       } catch (error) {
-        console.error('Failed to fetch user', error);
+        console.error("Failed to fetch user:", error);
       }
     };
-    if(!user)fetchUser();
-  }, [setUser]);
+    if (!user) fetchUser();
+  }, [setUser, user]);
 
   return (
-      <HeroUIProvider>
-          <NextThemesProvider attribute="class" defaultTheme="dark">
-              <main className={pretendard.className}>
-                  <NavBarComp/>
-                  <div className="overflow-x-hidden">
-                      <Component {...pageProps} />
-                      <div className="flex flex-col items-center justify-center gap-10 pt-10 ">
-                          <div className="h-full w-[80%] mx-auto px-10 py-3 rounded-t-3xl bg-gray-900/40 backdrop-blur-4xl text-gray-600">
-                              <div className="flex items-center gap-2">
-                                  <div className="w-[50px] h-[50px] rounded-xl overflow-hidden relative">
-                                      <Image
-                                          alt={`OnCount Image`}
-                                          src={OnCountLogo}
-                                          quality={100}
-                                          fill
-                                          style={{ objectFit: 'cover' }}
-                                      />
-                                  </div>
-                                  <p className="text-2xl font-extrabold">
-                                      온-카운트
-                                  </p>
-                              </div>
-                              <div className="w-full text-center">
-                                  <p className="text-sm text-gray-500">
-                                      Copyright ©2025 재능낭비개발자
-                                  </p>
-                                  <p className="text-sm text-gray-500">
-                                      Powered by{' '}
-                                      <span className="hover:underline hover:decoration-blue-600 hover:cursor-pointer hover:text-blue-600"
-                                            onClick={()=>window.open("https://eliv.kr/", "_blank")}>
-                                          PROJECT ELIV(도메인 제공)
-                                      </span>
-                                  </p>
-                              </div>
-                          </div>
-                      </div>
-
-                  </div>
-              </main>
-              {/*<HoverMenuBtn/>*/}
-              {/*<NoticeMobileMode/>*/}
-
-          </NextThemesProvider>
-      </HeroUIProvider>
-  )
+    <main className={pretendard.className}>
+      <NextThemesProvider attribute="class" defaultTheme="dark">
+        <HeroUIProvider>
+          <DefaultSeo {...SEO} />
+          <WebSiteJsonLd
+            name="온카운트"
+            url="https://on-count.kr"
+            potentialActions={[{
+              target: `https://on-count.kr/search?q={search_term_string}`,
+              queryInput: "required name=search_term_string",
+            }]}
+          />
+          <header className="sticky top-0 w-full z-50">
+            <NavBarComp />
+          </header>
+          <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
+            <Component {...pageProps} />
+          </main>
+          <footer className="w-full flex items-center justify-center py-3">
+            <div className="flex flex-col items-center gap-1 text-current">
+              <div className="flex items-center gap-1">
+                <Image src={OnCountLogo} alt="온카운트 로고" width={20} />
+                <p className="text-sm font-bold">온카운트</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">
+                  Powered by{" "}
+                  <button
+                    type="button"
+                    className="hover:underline hover:decoration-blue-600 hover:cursor-pointer hover:text-blue-600"
+                    onClick={() => window.open("https://eliv.kr/", "_blank")}
+                  >
+                    PROJECT ELIV(제공)
+                  </button>
+                </p>
+              </div>
+            </div>
+          </footer>
+        </HeroUIProvider>
+      </NextThemesProvider>
+    </main>
+  );
 }
+
+export default MyApp;

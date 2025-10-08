@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
+import { create } from "zustand";
 
 const useUserStore = create((set) => ({
   user: null,
