@@ -27,7 +27,7 @@ export default async function handler(req) {
           justifyContent: 'center',
           backgroundColor: '#1a1a1a',
           color: 'white',
-          fontFamily: ''Pretendard'',
+          fontFamily: 'Pretendard',
           padding: '40px',
         }}
       >
