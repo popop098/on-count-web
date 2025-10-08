@@ -1,4 +1,4 @@
-import { DefaultSeo, WebSiteJsonLd } from 'next-seo';
+import { DefaultSeo } from 'next-seo';
 import SEO from '../next-seo.config.js';
 import "@/styles/globals.css";
 import { HeroUIProvider } from "@heroui/react";
@@ -40,14 +40,6 @@ function MyApp({ Component, pageProps }) {
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <HeroUIProvider>
           <DefaultSeo {...SEO} />
-          <WebSiteJsonLd
-            name="온카운트"
-            url="https://on-count.kr"
-            potentialActions={[{
-              target: `https://on-count.kr/search?q={search_term_string}`,
-              queryInput: "required name=search_term_string",
-            }]}
-          />
           <header className="sticky top-0 w-full z-50">
             <NavBarComp />
           </header>

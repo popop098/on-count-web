@@ -1,4 +1,4 @@
-import { NextSeo, BreadcrumbJsonLd } from 'next-seo';
+import { NextSeo } from 'next-seo';
 import ContainerBox from "@/components/ContainerBox";
 
 export default function NoticePage() {
@@ -24,20 +24,6 @@ export default function NoticePage() {
             },
           ],
         }}
-      />
-      <BreadcrumbJsonLd
-        itemListElements={[
-          {
-            position: 1,
-            name: '홈',
-            item: 'https://on-count.kr',
-          },
-          {
-            position: 2,
-            name: '공지사항',
-            item: 'https://on-count.kr/notice',
-          },
-        ]}
       />
       <ContainerBox>
         <div className="w-full h-[10em]" />

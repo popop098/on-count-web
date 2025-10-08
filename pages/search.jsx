@@ -1,4 +1,4 @@
-import { NextSeo, BreadcrumbJsonLd } from 'next-seo';
+import { NextSeo } from 'next-seo';
 import { Button } from "@heroui/react";
 import buzzk from "buzzk";
 import { useRouter } from "next/router";
@@ -32,20 +32,6 @@ export default function Search({ data }) {
             },
           ],
         }}
-      />
-      <BreadcrumbJsonLd
-        itemListElements={[
-          {
-            position: 1,
-            name: '홈',
-            item: 'https://on-count.kr',
-          },
-          {
-            position: 2,
-            name: title,
-            item: `https://on-count.kr/search?q=${searchQuery}`,
-          },
-        ]}
       />
       <ContainerBox>
         <div className="w-full h-[10em]" />

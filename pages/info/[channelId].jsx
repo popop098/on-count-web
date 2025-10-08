@@ -1,4 +1,4 @@
-import { NextSeo, PersonJsonLd, BreadcrumbJsonLd } from 'next-seo';
+import { NextSeo } from 'next-seo';
 import { useRouter } from "next/router";
 import { memo, useEffect, useState } from "react";
 import useSWR from "swr";
@@ -290,25 +290,6 @@ export default function StreamerPage({ channelId, channelData }) {
             },
           ],
         }}
-      />
-      <PersonJsonLd
-        name={channelData?.channelName || '스트리머'}
-        images={[channelData?.channelImageUrl || 'https://on-count.kr/og-image.png']}
-        url={`https://on-count.kr/info/${channelId}`}
-      />
-      <BreadcrumbJsonLd
-        itemListElements={[
-          {
-            position: 1,
-            name: '홈',
-            item: 'https://on-count.kr',
-          },
-          {
-            position: 2,
-            name: channelData?.channelName || '스트리머',
-            item: `https://on-count.kr/info/${channelId}`,
-          },
-        ]}
       />
       {isEnabledUpAnimation && (
         <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-20 w-96 h-96 ">

@@ -42,6 +42,22 @@ const SEO = {
       name: 'theme-color',
       content: '#FFFFFF'
     }
+  ],
+  additionalJsonLd: [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      url: 'https://on-count.kr',
+      name: '온카운트',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: 'https://on-count.kr/search?q={search_term_string}'
+        },
+        'query-input': 'required name=search_term_string'
+      }
+    }
   ]
 };
 
