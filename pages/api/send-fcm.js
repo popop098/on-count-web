@@ -7,7 +7,7 @@ const sendFCMNotification = async (data,tokenList) => {
         // 얘는 기존 파이어베이스 api 키
         projectId: "on-count-fcc1b",
         // 얘네는 새로 구해온 서비스 계정 비공개 키
-        privateKey:process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        privateKey:process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
         clientEmail: "firebase-adminsdk-fbsvc@on-count-fcc1b.iam.gserviceaccount.com",
     };
 

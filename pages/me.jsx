@@ -3,20 +3,19 @@ import ContainerBox from "@/components/ContainerBox";
 import {
     Alert,
     Avatar,
-    Badge,
     Button,
-    Spinner,
     Modal,
-    ModalContent,
-    ModalHeader,
     ModalBody,
+    ModalContent,
     ModalFooter,
+    ModalHeader,
+    Spinner,
     useDisclosure
 } from "@heroui/react";
 import useSWR from "swr";
 import {swrFetcher} from "@/tools/fetchTools";
 import {memo, useEffect, useState} from "react";
-import NumberFlow,{continuous} from "@number-flow/react";
+import NumberFlow, {continuous} from "@number-flow/react";
 import {StreamerInfoCard} from "@/components/StreamerInfoCard";
 
 const FollowerCount = memo(({count}) => (
@@ -57,9 +56,7 @@ export default function Me() {
     const handleSigninBtn = async () => {
         setIsSigninBtnLoading(true);
         const generateSigninLink = await fetch('/api/auth/login', {})
-        const findSigninLink = await generateSigninLink.text()
-
-        window.location.href = findSigninLink
+        window.location.href = await generateSigninLink.text()
     }
     useEffect(()=>{
         console.log(data)
