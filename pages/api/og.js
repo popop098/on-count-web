@@ -1,9 +1,5 @@
 import { ImageResponse } from '@vercel/og';
 
-export const config = {
-  runtime: 'edge',
-};
-
 const font = fetch(new URL('../../public/fonts/pretendard/PretendardVariable.woff2', import.meta.url)).then(
   (res) => res.arrayBuffer(),
 );
