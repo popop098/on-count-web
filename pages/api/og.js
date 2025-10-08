@@ -1,11 +1,10 @@
 import { ImageResponse } from '@vercel/og';
 
-const font = fetch(new URL('../../public/fonts/pretendard/PretendardVariable.woff2', import.meta.url)).then(
-  (res) => res.arrayBuffer(),
-);
+export const config = {
+    runtime: 'edge',
+};
 
 export default async function handler(req) {
-  const fontData = await font;
   const { searchParams } = new URL(req.url);
 
   const title = searchParams.get('title') || '온카운트';
@@ -45,13 +44,6 @@ export default async function handler(req) {
     {
       width: 1200,
       height: 630,
-      fonts: [
-        {
-          name: 'Pretendard',
-          data: fontData,
-          style: 'normal',
-        },
-      ],
     },
   );
 }

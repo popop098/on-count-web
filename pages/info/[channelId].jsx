@@ -29,6 +29,7 @@ import { Slide, toast, ToastContainer } from "react-toastify";
 import Lottie from "react-lottie-player";
 import RocketLaunch from "@/public/assets/RocketLaunch.json";
 import { supabase } from "@/lib/supabaseClient";
+import {c} from "react/compiler-runtime";
 
 const FollowerCount = memo(({ count }) => (
   <NumberFlow value={count} plugins={[continuous]} willChange />
@@ -536,8 +537,7 @@ export async function getServerSideProps({ params }) {
     if (!channels || channels.length === 0) {
       return { notFound: true };
     }
-    const channelInfo = channels[0];
-
+    const channelInfo = channels.data[0];
     if (error) {
       return { props: { channelId, channelData: channelInfo } };
     }
