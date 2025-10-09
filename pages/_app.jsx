@@ -41,7 +41,7 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <main className={pretendard.className}>
-      <NextThemesProvider attribute="class" defaultTheme="dark">
+      <NextThemesProvider attribute={!pathname.startsWith('/ovly') ? "class" : undefined} defaultTheme={!pathname.startsWith('/ovly') ? "dark" : undefined}>
         <HeroUIProvider>
           <DefaultSeo {...SEO} />
           <header className="sticky top-0 w-full z-50">

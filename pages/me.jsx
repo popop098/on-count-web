@@ -209,6 +209,10 @@ export default function Me() {
           )}
             <div className="h-1 w-full rounded-3xl bg-gray-500" />
             <p className="text-lg font-semibold">오버레이 설정</p>
+            <Button color="primary" variant="shadow" onPress={()=>window.open('https://on-count-overlay.vercel.app/', '_blank')}>
+                신규 오버레이 페이지
+            </Button>
+            <p className="text-lg font-semibold">혹은 레거시</p>
             <div className="px-2 py-1 bg-gray-800 rounded hover:pointer hover:underline">
                 <CopyToClipboard
                     text={`https://on-count.kr/ovly/${user.channelId}?color=${color.anchorKey || "white"}`}
