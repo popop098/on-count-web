@@ -24,7 +24,7 @@ export const StreamerInfoCard = ({
           fullWidth
           color="primary"
           variant="ghost"
-          onPress={() => router.push(channelUrl)}
+          onPress={() => router.push(channelUrl, undefined,{shallow:true})}
         >
           이동
         </Button>

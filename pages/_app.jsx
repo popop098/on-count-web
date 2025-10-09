@@ -8,11 +8,13 @@ import { useEffect } from "react";
 import useUserStore, { useUser } from "@/store/userStore";
 import localFont from "next/font/local";
 import Image from "next/image";
+
 import OnCountLogo from "@/public/icon.png";
 const pretendard = localFont({
   src: "../public/fonts/pretendard/PretendardVariable.woff2",
   weight: "45 920",
   variable: "--font-pretendard",
+    display: "swap",
 });
 
 function MyApp({ Component, pageProps }) {
@@ -43,7 +45,7 @@ function MyApp({ Component, pageProps }) {
           <header className="sticky top-0 w-full z-50">
             <NavBarComp />
           </header>
-          <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
+          <main className="overflow-x-hidden">
             <Component {...pageProps} />
           </main>
           <footer className="w-full flex items-center justify-center py-3">
@@ -60,7 +62,7 @@ function MyApp({ Component, pageProps }) {
                     className="hover:underline hover:decoration-blue-600 hover:cursor-pointer hover:text-blue-600"
                     onClick={() => window.open("https://eliv.kr/", "_blank")}
                   >
-                    PROJECT ELIV(제공)
+                    PROJECT ELIV(도메인 제공)
                   </button>
                 </p>
               </div>

@@ -27,6 +27,7 @@ import {
 import OnCountLogo from "@/public/icon.png";
 import ChzzkLogo from "@/public/chzzk_Icon_02.png";
 import { useUser } from "@/store/userStore";
+import {useRouter} from "next/router";
 
 const menuItems = [{ name: "메인", href: "/" }];
 
@@ -37,6 +38,7 @@ export const NavBarComp = () => {
     onOpenChange: signinModalOnOpenChange,
   } = useDisclosure();
   const pathname = usePathname();
+  const router = useRouter();
   const [isSigninBtnLoading, setIsSigninBtnLoading] = useState(false);
   const [isMenuOpen, _setIsMenuOpen] = useState(false);
   const user = useUser();
@@ -105,6 +107,7 @@ export const NavBarComp = () => {
               width={50}
               height={50}
               className="rounded-xl"
+              onClick={()=>router.push('/')}
             />
           </NavbarBrand>
         </NavbarContent>

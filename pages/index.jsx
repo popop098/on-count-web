@@ -3,11 +3,15 @@ import { Button, Input, Spinner, Switch } from "@heroui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import DarkVeil from "@/components/backgrounds/DarkVeil";
 import ContainerBox from "@/components/ContainerBox";
 import { StreamerInfoCard } from "@/components/StreamerInfoCard";
 import TextType from "@/components/TextType";
 import { swrFetcher } from "@/tools/fetchTools";
+import dynamic from "next/dynamic";
+import {Suspense} from "react";
+const DarkVeil = dynamic(()=>import("@/components/backgrounds/DarkVeil"),{
+    ssr: true,
+})
 
 export default function Index() {
   const { data, isLoading, isValidating } = useSWR(
@@ -96,9 +100,11 @@ export default function Index() {
         }}
       />
       <ContainerBox>
-        <div style={{ width: "100%", height: "600px", position: "relative" }}>
-          <DarkVeil />
-        </div>
+          <Suspense fallback={<Spinner color="primary" size="lg" />}>
+            <div style={{ width: "100%", height: "600px", position: "relative" }}>
+              <DarkVeil />
+            </div>
+          </Suspense>
         <TextType
           text={[
             "실시간 팔로워 현황 검색은?",
