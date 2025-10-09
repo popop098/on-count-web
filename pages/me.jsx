@@ -2,27 +2,42 @@ import { NextSeo } from 'next-seo';
 import { memo, useEffect, useState } from "react";
 import useSWR from "swr";
 import {
-  Alert,
-  Avatar,
-  Button,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  useDisclosure,
+    Alert,
+    Avatar,
+    Button,
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalFooter,
+    ModalHeader, Select, SelectItem,
+    Spinner,
+    useDisclosure,
 } from "@heroui/react";
 import NumberFlow, { continuous } from "@number-flow/react";
 import ContainerBox from "@/components/ContainerBox";
 import { StreamerInfoCard } from "@/components/StreamerInfoCard";
 import { useUser } from "@/store/userStore";
 import { swrFetcher } from "@/tools/fetchTools";
-
+import { CopyToClipboard } from "react-copy-to-clipboard";
 const FollowerCount = memo(({ count }) => (
   <NumberFlow value={count} plugins={[continuous]} willChange />
 ));
 FollowerCount.displayName = "FollowerCount";
+
+export const colors = [
+    {key: "white", label: "White"},
+    {key: "black", label: "Black"},
+    {key: "red", label: "Red"},
+    {key: "orange", label: "Orange"},
+    {key: "yellow", label: "Yellow"},
+    {key: "green", label: "Green"},
+    {key: "teal", label: "Teal"},
+    {key: "blue", label: "Blue"},
+    {key: "indigo", label: "Indigo"},
+    {key: "purple", label: "Purple"},
+    {key: "pink", label: "Pink"},
+    {key: "gray", label: "Gray"},
+];
 
 export default function Me() {
   const user = useUser();
@@ -39,7 +54,7 @@ export default function Me() {
   const [patchApiLoading, setPatchApiLoading] = useState(false);
   const [isPublic, setIsPublic] = useState(data?.isPublic);
   const [_isSigninBtnLoading, setIsSigninBtnLoading] = useState(false);
-
+    const [color, setColor] = useState(new Set(["white"]));
   const handleChangePublicMode = async (setToPublicState) => {
     setPatchApiLoading(true);
     const patchApi = await fetch("/api/edit/info", {
@@ -172,7 +187,7 @@ export default function Me() {
                 <div className="w-2 h-2 bg-danger rounded-full" />
               )}
             </div>
-            <p className="text-[7rem] font-extrabold">
+                <p className={`text-[7rem] font-extrabold`} style={{color:color.anchorKey}}>
               <FollowerCount count={!data ? 0 : data.currFollowerCount} />
             </p>
           </div>
@@ -192,6 +207,22 @@ export default function Me() {
           ) : (
             <p className="text-lg font-semibold">구독 정보가 없어요.</p>
           )}
+            <div className="h-1 w-full rounded-3xl bg-gray-500" />
+            <p className="text-lg font-semibold">오버레이 설정</p>
+            <div className="px-2 py-1 bg-gray-800 rounded hover:pointer hover:underline">
+                <CopyToClipboard
+                    text={`https://on-count.kr/ovly/${user.channelId}?color=${color.anchorKey || "white"}`}
+                    onCopy={() => alert("오버레이 링크가 복사되었습니다.")}
+                >
+                    <code className="hover:pointer">https://on-count.kr/ovly/{user.channelId}?color={color}</code>
+                </CopyToClipboard>
+            </div>
+            <Select selectedKeys={color} defaultSelectedKeys={["white"]} onSelectionChange={setColor} className="max-w-xs" label="글자 색상 선택">
+                {colors.map((item) => (
+                    <SelectItem key={item.key}>{item.label}</SelectItem>
+                ))}
+            </Select>
+            <div className="h-1 w-full rounded-3xl bg-gray-500" />
           <Button
             color={isPublic ? "warning" : "primary"}
             onPress={onOpen}

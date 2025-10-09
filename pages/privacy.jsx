@@ -18,7 +18,7 @@ export default function Privacy() {
         }}
       />
       <ContainerBox>
-        <div className="w-full max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-4xl mx-auto py-32 px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             {title}
           </h1>
@@ -46,7 +46,7 @@ export default function Privacy() {
               서비스는 회원가입, 원활한 고객상담, 각종 서비스의 제공을 위해 아래와 같은 최소한의 개인정보를 필수항목으로 수집하고 있습니다.
             </p>
             <ul>
-              <li>필수항목: 이메일 주소, 닉네임</li>
+              <li>필수항목: 치지직 공식 API 제공 데이터(고유 채널 ID, 채널명, 채널 이미지 URL, 팔로워 수, 채널 인증 여부)</li>
               <li>선택항목: 없음</li>
             </ul>
 
