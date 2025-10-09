@@ -18,24 +18,23 @@ const pretendard = localFont({
 });
 
 function MyApp({ Component, pageProps }) {
-  const setUser = useUserStore((state) => state.setUser);
+    const { setUser } = useUserStore();
   const user = useUser();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const accessToken = localStorage.getItem("accessToken");
-        if (accessToken) {
-          const response = await fetch("/api/user");
-          const data = await response.json();
-          setUser(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-      }
-    };
-    if (!user) fetchUser();
-  }, [setUser, user]);
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await fetch('/api/user');
+                if (res.ok) {
+                    const user = await res.json();
+                    setUser(user);
+                }
+            } catch (error) {
+                console.error('Failed to fetch user', error);
+            }
+        };
+        if(!user)fetchUser();
+    }, [setUser]);
 
   return (
     <main className={pretendard.className}>
