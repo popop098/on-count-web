@@ -229,22 +229,25 @@ export default function Index() {
               온-카운트내에 등록과 공개상태인 스트리머 리스트에요.
             </p>
           </div>
-          {isLoading || isValidating || !data ? (
-            <div className="w-full h-64 flex flex-col items-center justify-center">
-              <Spinner color="primary" size="lg" />
+            <div className="flex flex-wrap items-center gap-1 w-full">
+                {isLoading || isValidating || !data ? (
+                    <div className="w-full h-64 flex flex-col items-center justify-center">
+                        <Spinner color="primary" size="lg" />
+                    </div>
+                ) : (
+                    data.map((item) => (
+                        <StreamerInfoCard
+                            key={item.channel_id}
+                            channelName={item.channel_name}
+                            channelImageUrl={item.channel_image_url}
+                            channelUrl={`/info/${item.channel_id}`}
+                            channelFollwerCount={item.follower_count}
+                            channelVerificationMark={item.verified_mark}
+                        />
+                    ))
+                )}
             </div>
-          ) : (
-            data.map((item) => (
-              <StreamerInfoCard
-                key={item.channel_id}
-                channelName={item.channel_name}
-                channelImageUrl={item.channel_image_url}
-                channelUrl={`/info/${item.channel_id}`}
-                channelFollwerCount={item.follower_count}
-                channelVerificationMark={item.verified_mark}
-              />
-            ))
-          )}
+
         </div>
       </ContainerBox>
     </>
