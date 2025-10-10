@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "node tools/generate-sitemap.mjs && next build",
+    "dev": "next dev --turbopack",
+    "build": "node tools/generate-sitemap.mjs && next build --turbopack",
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write"
   },
   "dependencies": {
+    "@channel.io/channel-web-sdk-loader": "^2.0.0",
     "@ducanh2912/next-pwa": "^10.2.9",
     "@heroui/react": "^2.8.4",
     "@number-flow/react": "^0.5.10",
@@ -27,7 +28,6 @@
     "next-themes": "^0.4.6",
     "ogl": "^1.0.11",
     "react": "19.1.0",
-    "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "19.1.0",
     "react-lottie-player": "^2.1.0",
     "react-toastify": "^11.0.5",
