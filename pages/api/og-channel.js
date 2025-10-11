@@ -40,15 +40,15 @@ export default async function handler(req) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 56 }}>
           <div
             style={{
-              width: 520,
-              height: 320,
-              borderRadius: 24,
+              width: 360,
+              height: 360,
+              borderRadius: 9999,
               overflow: 'hidden',
               boxShadow: '0 20px 60px rgba(0,0,0,0.45)',
               display: 'flex',
             }}
           >
-            <img src={img} alt="channel" width={520} height={320} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+            <img src={img} alt="channel" width={360} height={360} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -106,6 +106,9 @@ export default async function handler(req) {
     {
       width: 1200,
       height: 630,
+      headers: {
+        'cache-control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=2592000',
+      },
     }
   );
 }
