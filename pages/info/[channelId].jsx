@@ -284,6 +284,14 @@ export default function StreamerPage({ channelId, channelData }) {
           url: `https://on-count.kr/info/${channelId}`,
           title: title,
           description: description,
+          images: [
+            {
+              url: `https://on-count.kr/api/og-channel?name=${encodeURIComponent(channelData?.channelName || '스트리머')}&follower=${encodeURIComponent(String(channelData?.currFollowerCount || channelData?.dbFollowerCount || 0))}&img=${encodeURIComponent(channelData?.channelImageUrl || 'https://on-count.kr/icon.png')}&verified=${channelData?.verifiedMark ? 'true' : 'false'}`,
+              width: 1200,
+              height: 630,
+              alt: `${channelData?.channelName || '스트리머'} OG 이미지`,
+            },
+          ],
         }}
       />
       {isEnabledUpAnimation && (
