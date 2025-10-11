@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, CardHeader } from "@heroui/react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { memo } from "react";
+import { memo, useState } from "react";
 
 const StreamerInfoCard = memo(({
   channelName,
@@ -11,8 +11,11 @@ const StreamerInfoCard = memo(({
   channelVerificationMark,
 }) => {
   const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleClick = () => {
+    if (isNavigating) return;
+    setIsNavigating(true);
     router.push(channelUrl, undefined, { shallow: true });
   };
 
@@ -56,6 +59,8 @@ const StreamerInfoCard = memo(({
           color="primary"
           variant="ghost"
           onPress={handleClick}
+          isLoading={isNavigating}
+          disabled={isNavigating}
         >
           이동
         </Button>

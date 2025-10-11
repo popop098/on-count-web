@@ -132,6 +132,12 @@ export default function Index() {
               size="sm"
               className="h-full text-xl"
               onPress={() => {
+                // 간단한 페이지 이동 로딩 UX
+                const goBtn = document.activeElement;
+                if (goBtn) {
+                  goBtn.setAttribute("aria-busy", "true");
+                  goBtn.setAttribute("disabled", "true");
+                }
                 if (enabledSaveSearchHistory) {
                   const prevHistory = Array.isArray(searchHistory)
                     ? searchHistory
