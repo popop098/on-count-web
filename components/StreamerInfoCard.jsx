@@ -66,4 +66,5 @@ const StreamerInfoCard = memo(({
 
 StreamerInfoCard.displayName = 'StreamerInfoCard';
 
+export default StreamerInfoCard;
 export { StreamerInfoCard };
