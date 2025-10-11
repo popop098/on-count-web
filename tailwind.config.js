@@ -4,7 +4,9 @@ const { heroui } = require("@heroui/react");
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    // ...
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
     // make sure it's pointing to the ROOT node_module
     "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
@@ -16,6 +18,25 @@ module.exports = {
     },
   },
   darkMode: "class",
+  // Optimize for production
+  purge: {
+    enabled: process.env.NODE_ENV === 'production',
+    content: [
+      "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+      "./components/**/*.{js,ts,jsx,tsx,mdx}",
+      "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    ],
+    options: {
+      safelist: [
+        // Keep dynamic classes that might be missed
+        'animate-pulse',
+        'bg-gradient-to-br',
+        'from-purple-900',
+        'via-blue-900',
+        'to-indigo-900',
+      ]
+    }
+  },
   plugins: [
     heroui({
       themes: {

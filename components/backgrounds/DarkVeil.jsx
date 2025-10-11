@@ -80,16 +80,27 @@ export default function DarkVeil({
   speed = 0.5,
   scanlineFrequency = 0,
   warpAmount = 0,
-  resolutionScale = 1,
+  resolutionScale = 0.5, // Reduced default resolution for better performance
 }) {
   const ref = useRef(null);
+  const animationRef = useRef(null);
+  const rendererRef = useRef(null);
+  const programRef = useRef(null);
+  const meshRef = useRef(null);
+
   useEffect(() => {
     const canvas = ref.current;
-    const parent = canvas.parentElement;
+    if (!canvas) return;
 
+    const parent = canvas.parentElement;
+    if (!parent) return;
+
+    // Use lower DPR for better performance
     const renderer = new Renderer({
-      dpr: Math.min(window.devicePixelRatio, 2),
+      dpr: Math.min(window.devicePixelRatio, 1.5), // Reduced from 2
       canvas,
+      alpha: false, // Disable alpha for better performance
+      antialias: false, // Disable antialiasing for better performance
     });
 
     const gl = renderer.gl;
@@ -111,36 +122,77 @@ export default function DarkVeil({
 
     const mesh = new Mesh(gl, { geometry, program });
 
+    // Store references for cleanup
+    rendererRef.current = renderer;
+    programRef.current = program;
+    meshRef.current = mesh;
+
     const resize = () => {
-      const w = parent.clientWidth,
-        h = parent.clientHeight;
+      const w = parent.clientWidth;
+      const h = parent.clientHeight;
       renderer.setSize(w * resolutionScale, h * resolutionScale);
       program.uniforms.uResolution.value.set(w, h);
     };
 
-    window.addEventListener("resize", resize);
+    const handleResize = () => {
+      // Throttle resize events
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      animationRef.current = requestAnimationFrame(resize);
+    };
+
+    window.addEventListener("resize", handleResize);
     resize();
 
     const start = performance.now();
-    let frame = 0;
+    let lastTime = 0;
+    const targetFPS = 30; // Limit to 30 FPS for better performance
+    const frameInterval = 1000 / targetFPS;
 
-    const loop = () => {
-      program.uniforms.uTime.value =
-        ((performance.now() - start) / 1000) * speed;
-      program.uniforms.uHueShift.value = hueShift;
-      program.uniforms.uNoise.value = noiseIntensity;
-      program.uniforms.uScan.value = scanlineIntensity;
-      program.uniforms.uScanFreq.value = scanlineFrequency;
-      program.uniforms.uWarp.value = warpAmount;
-      renderer.render({ scene: mesh });
-      frame = requestAnimationFrame(loop);
+    const loop = (currentTime) => {
+      if (currentTime - lastTime >= frameInterval) {
+        const time = ((currentTime - start) / 1000) * speed;
+        
+        // Only update uniforms if they've changed
+        if (program.uniforms.uTime.value !== time) {
+          program.uniforms.uTime.value = time;
+        }
+        if (program.uniforms.uHueShift.value !== hueShift) {
+          program.uniforms.uHueShift.value = hueShift;
+        }
+        if (program.uniforms.uNoise.value !== noiseIntensity) {
+          program.uniforms.uNoise.value = noiseIntensity;
+        }
+        if (program.uniforms.uScan.value !== scanlineIntensity) {
+          program.uniforms.uScan.value = scanlineIntensity;
+        }
+        if (program.uniforms.uScanFreq.value !== scanlineFrequency) {
+          program.uniforms.uScanFreq.value = scanlineFrequency;
+        }
+        if (program.uniforms.uWarp.value !== warpAmount) {
+          program.uniforms.uWarp.value = warpAmount;
+        }
+
+        renderer.render({ scene: mesh });
+        lastTime = currentTime;
+      }
+      
+      animationRef.current = requestAnimationFrame(loop);
     };
 
-    loop();
+    animationRef.current = requestAnimationFrame(loop);
 
     return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("resize", resize);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      window.removeEventListener("resize", handleResize);
+      
+      // Clean up WebGL resources
+      if (rendererRef.current) {
+        rendererRef.current.gl.getExtension('WEBGL_lose_context')?.loseContext();
+      }
     };
   }, [
     hueShift,
@@ -151,5 +203,6 @@ export default function DarkVeil({
     warpAmount,
     resolutionScale,
   ]);
+
   return <canvas ref={ref} className="w-full h-full block" />;
 }

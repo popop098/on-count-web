@@ -9,15 +9,26 @@ import TextType from "@/components/TextType";
 import { swrFetcher } from "@/tools/fetchTools";
 import dynamic from "next/dynamic";
 import {Suspense} from "react";
+
+// Lazy load the heavy WebGL component
 const DarkVeil = dynamic(()=>import("@/components/backgrounds/DarkVeil"),{
-    ssr: true,
+    ssr: false, // Disable SSR for WebGL component
+    loading: () => (
+        <div className="w-full h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 animate-pulse" />
+    ),
 })
 
 export default function Index() {
   const { data, isLoading, isValidating } = useSWR(
     "/api/get-channels-data",
     swrFetcher,
-    { revalidateOnFocus: false },
+    { 
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 10000, // 10 seconds
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
+    },
   );
   const [searchInput, setSearchInput] = useState("");
   const [enabledSaveSearchHistory, setEnabledSaveSearchHistory] =

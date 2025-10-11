@@ -11,22 +11,27 @@ import Image from "next/image";
 import * as ChannelService from '@channel.io/channel-web-sdk-loader';
 import OnCountLogo from "@/public/icon.png";
 import {useRouter} from "next/router";
+import PerformanceMonitor from "@/components/PerformanceMonitor";
 const pretendard = localFont({
   src: "../public/fonts/pretendard/PretendardVariable.woff2",
   weight: "45 920",
   variable: "--font-pretendard",
-    display: "swap",
+  display: "swap",
+  preload: true,
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
 });
-ChannelService.loadScript()
 function MyApp({ Component, pageProps }) {
     const { setUser } = useUserStore();
   const user = useUser();
     const router = useRouter();
 
     useEffect(()=>{
-        ChannelService.boot({
-            "pluginKey": "b5cd1ac0-3d25-4b09-bdac-70cced30c09e", // fill your plugin key
-        });
+        // Load ChannelService asynchronously
+        ChannelService.loadScript().then(() => {
+            ChannelService.boot({
+                "pluginKey": "b5cd1ac0-3d25-4b09-bdac-70cced30c09e", // fill your plugin key
+            });
+        }).catch(console.error);
     },[])
     useEffect(() => {
         const fetchUser = async () => {
@@ -45,6 +50,7 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <main className={pretendard.className}>
+      <PerformanceMonitor />
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <HeroUIProvider>
           <DefaultSeo {...SEO} />
