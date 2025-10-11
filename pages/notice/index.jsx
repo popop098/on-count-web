@@ -15,14 +15,6 @@ export default function NoticePage() {
           url: 'https://on-count.kr/notice',
           title: title,
           description: description,
-          images: [
-            {
-              url: `https://on-count.kr/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`,
-              width: 1200,
-              height: 630,
-              alt: '온카운트 공지사항',
-            },
-          ],
         }}
       />
       <ContainerBox>

@@ -23,14 +23,6 @@ export default function Search({ data }) {
           url: `https://on-count.kr/search?q=${searchQuery}`,
           title: title,
           description: description,
-          images: [
-            {
-              url: `https://on-count.kr/api/og?title=${encodeURIComponent(title)}`,
-              width: 1200,
-              height: 630,
-              alt: `'${searchQuery}' 검색 결과`,
-            },
-          ],
         }}
       />
       <ContainerBox>
