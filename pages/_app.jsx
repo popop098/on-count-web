@@ -10,7 +10,6 @@ import localFont from "next/font/local";
 import Image from "next/image";
 import OnCountLogo from "@/public/icon.png";
 import {useRouter} from "next/router";
-import dynamic from "next/dynamic";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -32,10 +31,7 @@ const pretendard = localFont({
   ],
 });
 
-// Lazy load Channel.io only when needed
-const ChannelService = dynamic(() => import('@channel.io/channel-web-sdk-loader'), {
-  ssr: false
-});
+// Channel.io will be loaded dynamically in useEffect
 function MyApp({ Component, pageProps }) {
     const { setUser } = useUserStore();
   const user = useUser();
