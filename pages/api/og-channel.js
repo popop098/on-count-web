@@ -14,6 +14,11 @@ export default async function handler(req) {
 
   const followerText = `팔로워 ${Number(follower).toLocaleString()}명`;
 
+  // Responsive channel name sizing to prevent clipping
+  const nameLen = (channelName || '').length;
+  const nameFontSize = nameLen > 22 ? 58 : nameLen > 16 ? 68 : nameLen > 12 ? 78 : 88;
+  const nameMaxWidth = 700; // safe width so long names wrap to two lines if needed
+
   return new ImageResponse(
     (
       <div
@@ -46,7 +51,7 @@ export default async function handler(req) {
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <div style={{ fontSize: 88, fontWeight: 900, lineHeight: 1.1, maxWidth: 620 }}>{channelName}</div>
+              <div style={{ fontSize: nameFontSize, fontWeight: 900, lineHeight: 1.1, maxWidth: nameMaxWidth, marginRight: 4 }}>{channelName}</div>
               {verified && (
                 <div style={{ display: 'flex' }}>
                   <div
@@ -85,7 +90,7 @@ export default async function handler(req) {
               borderRadius: 12,
             }}
           >
-            <div style={{ fontSize: 28, color: '#e2e8f0', fontWeight: 700 }}>on-count.kr</div>
+            <div style={{ fontSize: 28, color: '#e2e8f0', fontWeight: 800 }}>온-카운트 | on-count.kr</div>
             <div style={{ fontSize: 20, color: '#94a3b8' }}>실시간 스트리머 팔로워 현황</div>
           </div>
         </div>
