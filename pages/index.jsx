@@ -173,24 +173,27 @@ export default function Index() {
             onChange={(e) => handleSwitchSaveSearchHistoryOption(e)}
             isSelected={enabledSaveSearchHistory}
           >
-            검색 기록 {enabledSaveSearchHistory ? "끄기" : "켜기"}
+            검색 기록 {enabledSaveSearchHistory === true ? "끄기" : "켜기"}
           </Switch>
           <div className="flex flex-wrap items-center justify-center gap-2 w-full">
-            {searchHistory?.map((item, index) => (
-              <div key={`search-history-${item}-${index}`} className="relative">
-                <Button
-                  size="sm"
-                  onPress={() =>
-                    router.push({
-                      pathname: "/search",
-                      query: {
-                        q: item,
-                      },
-                    })
-                  }
-                >
-                  {item}
-                </Button>
+            {searchHistory?.map((item, index) => {
+              // Ensure item is a string to prevent React error #130
+              const displayItem = typeof item === 'string' ? item : String(item || '');
+              return (
+                <div key={`search-history-${displayItem}-${index}`} className="relative">
+                  <Button
+                    size="sm"
+                    onPress={() =>
+                      router.push({
+                        pathname: "/search",
+                        query: {
+                          q: displayItem,
+                        },
+                      })
+                    }
+                  >
+                    {displayItem}
+                  </Button>
                 <div
                   role="button"
                   tabIndex={0}
@@ -220,8 +223,9 @@ export default function Index() {
                 >
                   x
                 </div>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -241,16 +245,16 @@ export default function Index() {
                         <Spinner color="primary" size="lg" />
                     </div>
                 ) : (
-                    data.map((item) => (
+                    Array.isArray(data) ? data.map((item) => (
                         <StreamerInfoCard
-                            key={item.channel_id}
-                            channelName={item.channel_name}
-                            channelImageUrl={item.channel_image_url}
-                            channelUrl={`/info/${item.channel_id}`}
-                            channelFollwerCount={item.follower_count}
-                            channelVerificationMark={item.verified_mark}
+                            key={item?.channel_id || Math.random()}
+                            channelName={item?.channel_name || ''}
+                            channelImageUrl={item?.channel_image_url || ''}
+                            channelUrl={`/info/${item?.channel_id || ''}`}
+                            channelFollwerCount={item?.follower_count || 0}
+                            channelVerificationMark={item?.verified_mark || false}
                         />
-                    ))
+                    )) : null
                 )}
             </div>
 
