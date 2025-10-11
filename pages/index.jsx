@@ -6,12 +6,13 @@ import useSWR from "swr";
 import ContainerBox from "@/components/ContainerBox";
 import { StreamerInfoCard } from "@/components/StreamerInfoCard";
 import TextType from "@/components/TextType";
-import { swrFetcher } from "@/tools/fetchTools";
+import { swrFetcher } from "@/tools/swrFetcher";
 import dynamic from "next/dynamic";
 import {Suspense} from "react";
-const DarkVeil = dynamic(()=>import("@/components/backgrounds/DarkVeil"),{
-    ssr: true,
-})
+const DarkVeil = dynamic(() => import("@/components/backgrounds/DarkVeil"), {
+  ssr: false,
+  suspense: true,
+});
 
 export default function Index() {
   const { data, isLoading, isValidating } = useSWR(

@@ -43,8 +43,9 @@ export default async function handler(req, res) {
       try {
         const channelResponse = await getChannelsInfo(channelId);
 
-        if (channelResponse.data.length > 0) {
-          const channelResponseData = channelResponse.data[0];
+        const list = channelResponse.data || channelResponse;
+        if (list.length > 0) {
+          const channelResponseData = list[0];
           const { followerCount, channelImageUrl, verifiedMark } =
             channelResponseData;
           follower_count = followerCount;

@@ -13,11 +13,13 @@ import {
     Spinner,
     useDisclosure,
 } from "@heroui/react";
-import NumberFlow, { continuous } from "@number-flow/react";
+import dynamic from "next/dynamic";
+const NumberFlow = dynamic(() => import("@number-flow/react"), { ssr: false });
+import { continuous } from "@number-flow/react";
 import ContainerBox from "@/components/ContainerBox";
 import { StreamerInfoCard } from "@/components/StreamerInfoCard";
 import { useUser } from "@/store/userStore";
-import { swrFetcher } from "@/tools/fetchTools";
+import { swrFetcher } from "@/tools/swrFetcher";
 const FollowerCount = memo(({ count }) => (
   <NumberFlow value={count} plugins={[continuous]} willChange />
 ));

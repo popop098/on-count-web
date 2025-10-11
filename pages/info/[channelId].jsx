@@ -2,9 +2,13 @@ import { NextSeo } from 'next-seo';
 import { useRouter } from "next/router";
 import { memo, useEffect, useState } from "react";
 import useSWR from "swr";
-import { getChannelsInfo, swrFetcher } from "@/tools/fetchTools";
+import { getChannelsInfo } from "@/tools/fetchTools";
+import { swrFetcher } from "@/tools/swrFetcher";
 import Image from "next/image";
-import NumberFlow, { continuous } from "@number-flow/react";
+import { ToastContainer, toast, Slide } from "react-toastify";
+import dynamic from "next/dynamic";
+const NumberFlow = dynamic(() => import("@number-flow/react"), { ssr: false });
+import { continuous } from "@number-flow/react";
 import {
   Accordion,
   AccordionItem,
@@ -22,14 +26,23 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useUser } from "@/store/userStore";
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
-import axios from "axios";
-import { Slide, toast, ToastContainer } from "react-toastify";
-import Lottie from "react-lottie-player";
-import RocketLaunch from "@/public/assets/RocketLaunch.json";
-import { supabase } from "@/lib/supabaseClient";
-import {c} from "react/compiler-runtime";
+const Lottie = dynamic(() => import("react-lottie-player"), { ssr: false });
+// Lazy-load the large JSON at render time to avoid bundling in main chunk
+const useRocketAnimationData = (isEnabled) => {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    if (!isEnabled || data) return;
+    let mounted = true;
+    import("@/public/assets/RocketLaunch.json").then((m) => {
+      if (mounted) setData(m.default || m);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [isEnabled, data]);
+  return data;
+};
+// supabase is imported only in getServerSideProps to avoid client bundle impact
 
 const FollowerCount = memo(({ count }) => (
   <NumberFlow value={count} plugins={[continuous]} willChange />
@@ -163,9 +176,13 @@ export default function StreamerPage({ channelId, channelData }) {
   const [enabledSoundEffect, setEnabledSoundEffect] = useState(true);
   const [isEnabledUpAnimation, setIsEnabledUpAnimation] = useState(false);
   const [isEnabledDownAnimation, setIsEnabledDownAnimation] = useState(false);
+  const rocketAnimationData = useRocketAnimationData(isEnabledUpAnimation);
   const handleSubscribe = async () => {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") return false;
+
+    const { initializeApp } = await import("firebase/app");
+    const { getMessaging, getToken } = await import("firebase/messaging");
 
     const firebaseApp = initializeApp({
       apiKey: "AIzaSyBwMRuuJ-UQIU98u5jx_plZUeEJMBfyScs",
@@ -186,17 +203,17 @@ export default function StreamerPage({ channelId, channelData }) {
       .then((currentToken) => {
         if (currentToken) {
           console.log(currentToken);
-          axios
-            .post("/api/subscribe", {
+          fetch("/api/subscribe", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
               channel_id: channelId,
               user_id: user.channelId,
               topic: "streamer_subscribe",
               fcm_token: currentToken,
-            })
-            .then((data) => {
-              if (data.status !== 200) return null;
-              mutate();
-            });
+            }),
+          })
+            .then((resp) => { if (resp.status !== 200) return null; mutate(); });
         } else {
           console.log(
             "No registration token available. Request permission to generate one.",
@@ -209,12 +226,14 @@ export default function StreamerPage({ channelId, channelData }) {
   };
 
   const handleUnsubscribe = async () => {
-    const resp = await axios.delete("/api/subscribe", {
-      data: {
+    const resp = await fetch("/api/subscribe", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         channel_id: channelId,
         user_id: user.channelId,
         topic: "streamer_subscribe",
-      },
+      }),
     });
     if (resp.status !== 200)
       return alert("무엇인가 잘못되었어요. 잠시후 다시 시도해주세요.");
@@ -295,7 +314,7 @@ export default function StreamerPage({ channelId, channelData }) {
       {isEnabledUpAnimation && (
         <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-20 w-96 h-96 ">
           <Lottie
-            animationData={RocketLaunch}
+            animationData={rocketAnimationData}
             loop={false}
             play
             autoplay
@@ -305,6 +324,7 @@ export default function StreamerPage({ channelId, channelData }) {
         </div>
       )}
 
+      {/* Toast container is only used on client; import CSS in _app */}
       <ToastContainer
         position="bottom-center"
         autoClose={5000}
@@ -314,7 +334,6 @@ export default function StreamerPage({ channelId, channelData }) {
         rtl={false}
         draggable
         theme="colored"
-        transition={Slide}
         stacked
       />
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -424,8 +443,9 @@ export default function StreamerPage({ channelId, channelData }) {
                   alt={`${data?.channelName}Image`}
                   src={data?.channelImageUrl}
                   quality={100}
-                  layout="fill"
-                  objectFit="cover"
+                  fill
+                  sizes="(max-width: 768px) 150px, 150px"
+                  style={{ objectFit: "cover" }}
                 />
               </div>
               <div className="flex flex-col items-center justify-center gap-1">
@@ -524,6 +544,7 @@ export default function StreamerPage({ channelId, channelData }) {
 }
 
 export async function getServerSideProps({ params }) {
+  const { supabase } = await import("@/lib/supabaseClient");
   const { channelId } = params;
 
   try {
@@ -534,10 +555,11 @@ export async function getServerSideProps({ params }) {
       .single();
 
     const channels = await getChannelsInfo(channelId);
-    if (!channels || channels.length === 0) {
+    const list = channels?.data || channels;
+    if (!list || list.length === 0) {
       return { notFound: true };
     }
-    const channelInfo = channels.data[0];
+    const channelInfo = list[0];
     if (error) {
       return { props: { channelId, channelData: channelInfo } };
     }

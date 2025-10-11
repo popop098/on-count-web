@@ -5,10 +5,10 @@ import { HeroUIProvider } from "@heroui/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { NavBarComp } from "@/components/NavBarComp";
 import { useEffect } from "react";
+import 'react-toastify/dist/ReactToastify.css';
 import useUserStore, { useUser } from "@/store/userStore";
 import localFont from "next/font/local";
 import Image from "next/image";
-import * as ChannelService from '@channel.io/channel-web-sdk-loader';
 import OnCountLogo from "@/public/icon.png";
 import {useRouter} from "next/router";
 const pretendard = localFont({
@@ -17,17 +17,34 @@ const pretendard = localFont({
   variable: "--font-pretendard",
     display: "swap",
 });
-ChannelService.loadScript()
+// Defer Channel.io script to the client after idle
 function MyApp({ Component, pageProps }) {
     const { setUser } = useUserStore();
   const user = useUser();
     const router = useRouter();
 
-    useEffect(()=>{
-        ChannelService.boot({
-            "pluginKey": "b5cd1ac0-3d25-4b09-bdac-70cced30c09e", // fill your plugin key
-        });
-    },[])
+    useEffect(() => {
+        const run = async () => {
+            if (typeof window === 'undefined') return;
+            const loader = () => import('@channel.io/channel-web-sdk-loader');
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(async () => {
+                    const ChannelService = await loader();
+                    ChannelService.loadScript();
+                    ChannelService.boot({
+                        pluginKey: 'b5cd1ac0-3d25-4b09-bdac-70cced30c09e',
+                    });
+                });
+            } else {
+                const ChannelService = await loader();
+                ChannelService.loadScript();
+                ChannelService.boot({
+                    pluginKey: 'b5cd1ac0-3d25-4b09-bdac-70cced30c09e',
+                });
+            }
+        };
+        run();
+    }, []);
     useEffect(() => {
         const fetchUser = async () => {
             try {

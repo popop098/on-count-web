@@ -15,18 +15,18 @@ export default async function handler(req, res) {
     let getChannelResp;
     if (error) {
       getChannelResp = await getChannelsInfo(channelid);
-      if (getChannelResp.data.length === 0)
+      if (getChannelResp.data?.length === 0)
         return res.status(404).send("No channel found");
-      return res.status(200).json(getChannelResp.data[0]);
+      return res.status(200).json((getChannelResp.data || getChannelResp)[0]);
     }
     const { follower_count, channel_image_url, verified_mark, is_public } =
       profile;
     switch (mode) {
       case "followers": {
         const getChannelResp = await getChannelsInfo(channelid);
-        if (getChannelResp.data.length === 0)
+        if ((getChannelResp.data || getChannelResp).length === 0)
           return res.status(404).send("No channel found");
-        const { followerCount, channelName } = getChannelResp.data[0];
+        const { followerCount, channelName } = (getChannelResp.data || getChannelResp)[0];
         return res.status(200).json({
           dbFollowerCount: follower_count,
           currFollowerCount: followerCount,

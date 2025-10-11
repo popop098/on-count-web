@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "node tools/generate-sitemap.mjs && next build",
+    "analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write"
@@ -37,6 +38,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
     "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "@next/bundle-analyzer": "^15.5.4"
   }
 }

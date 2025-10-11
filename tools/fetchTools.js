@@ -9,7 +9,7 @@ const deafultApiUrls = {
   channels: (channelIds) => `/open/v1/channels?channelIds=${channelIds}`,
 };
 
-export const swrFetcher = (...args) => fetch(...args).then((res) => res.json());
+// Moved swrFetcher to tools/swrFetcher.js to avoid importing axios on client
 
 export const getAccessToken = async ({ code, state }) => {
   const resp = await axios.post(
@@ -31,13 +31,13 @@ export const getAccessToken = async ({ code, state }) => {
 };
 
 export const getMeInfo = async (accessToken) => {
-  const resp = await axios.get(deafultApiUrls.endpoint + deafultApiUrls.me, {
+  const resp = await fetch(deafultApiUrls.endpoint + deafultApiUrls.me, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
-  });
-  const { channelId, channelName } = resp.data.content;
+  }).then(r=>r.json());
+  const { channelId, channelName } = resp.content;
   return {
     channelId,
     channelName,
@@ -45,7 +45,7 @@ export const getMeInfo = async (accessToken) => {
 };
 
 export const getChannelsInfo = async (channelIds) => {
-  const resp = await axios.get(
+  const resp = await fetch(
     deafultApiUrls.endpoint + deafultApiUrls.channels(channelIds),
     {
       headers: {
@@ -54,6 +54,6 @@ export const getChannelsInfo = async (channelIds) => {
         "Content-Type": "application/json",
       },
     },
-  );
-  return resp.data.content;
+  ).then(r=>r.json());
+  return resp.content;
 };

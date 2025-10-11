@@ -1,6 +1,6 @@
 import { NextSeo } from 'next-seo';
 import { Button } from "@heroui/react";
-import buzzk from "buzzk";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import ContainerBox from "@/components/ContainerBox";
 import { StreamerInfoCard } from "@/components/StreamerInfoCard";
@@ -69,6 +69,7 @@ export default function Search({ data }) {
 
 export async function getServerSideProps({ query }) {
   const { q } = query;
+  const { default: buzzk } = await import("buzzk");
   buzzk.login(process.env.CHZZK_NID_AUT, process.env.CHZZK_NID_SES);
   return {
     props: {

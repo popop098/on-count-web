@@ -15,6 +15,7 @@ export const StreamerInfoCard = ({
             src={channelImageUrl}
             style={{ objectFit: "cover" }}
             fill
+            sizes="(max-width: 768px) 150px, 150px"
           />
         </div>
         <CardHeader className="pb-0 pt-2 px-4 flex justify-center">

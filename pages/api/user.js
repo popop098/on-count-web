@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   try {
     // 1. Verify token and get userId from Chzzk API.
-    const profileResponse = await axios.get(
+    const profileResponse = await fetch(
       "https://openapi.chzzk.naver.com/open/v1/users/me",
       {
         headers: {
@@ -24,9 +24,9 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
         },
       },
-    );
+    ).then(r=>r.json());
 
-    const { channelId } = profileResponse.data.content;
+    const { channelId } = profileResponse.content;
 
     // 2. Fetch the complete user profile from your Supabase DB
     const { data: profile, error: dbError } = await supabase

@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         // 2. join()을 사용하여 배열의 요소들을 쉼표와 공백으로 연결하여 문자열로 변환
         const resultString = channelIdsArray.join(",");
         const resp = await getChannelsInfo(resultString);
-        return res.status(200).json(resp.data);
+        return res.status(200).json(resp.data || resp);
       }
       return res.status(200).json(subscribedData);
     }

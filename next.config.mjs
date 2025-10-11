@@ -1,4 +1,5 @@
 import withPWAInit from "@ducanh2912/next-pwa";
+import bundleAnalyzer from "@next/bundle-analyzer";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -9,7 +10,8 @@ const nextConfig = {
         hostname: "nng-phinf.pstatic.net",
       },
     ],
-    qualities: [100],
+    formats: ["image/webp", "image/avif"],
+    minimumCacheTTL: 31536000,
   },
   webpack: (config, { isServer: _isServer }) => {
     // Add a rule to handle .lottie files as raw assets (like file-loader)
@@ -23,6 +25,14 @@ const nextConfig = {
 
     return config;
   },
+  experimental: {
+    optimizePackageImports: [
+      "@heroui/react",
+      "react-toastify",
+      "firebase/app",
+      "firebase/messaging",
+    ],
+  },
 };
 
 const withPWA = withPWAInit({
@@ -34,4 +44,5 @@ const withPWA = withPWAInit({
         document: '/_offline', // will be created later
     },
 });
-export default withPWA(nextConfig);
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === 'true' });
+export default withBundleAnalyzer(withPWA(nextConfig));

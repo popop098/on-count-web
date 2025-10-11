@@ -107,6 +107,7 @@ export const NavBarComp = () => {
               width={50}
               height={50}
               className="rounded-xl"
+              priority
               onClick={()=>router.push('/')}
             />
           </NavbarBrand>
