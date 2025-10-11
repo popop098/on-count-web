@@ -1,7 +1,13 @@
 "use client";
 
-import { useCallback, createElement, useEffect, useMemo, useRef, useState } from "react";
-import { gsap } from "gsap";
+import {
+  createElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 const TextType = ({
   text,
@@ -66,18 +72,7 @@ const TextType = ({
     return () => observer.disconnect();
   }, [startOnVisible]);
 
-  useEffect(() => {
-    if (showCursor && cursorRef.current) {
-      gsap.set(cursorRef.current, { opacity: 1 });
-      gsap.to(cursorRef.current, {
-        opacity: 0,
-        duration: cursorBlinkDuration,
-        repeat: -1,
-        yoyo: true,
-        ease: "power2.inOut",
-      });
-    }
-  }, [showCursor, cursorBlinkDuration]);
+  // Cursor animation now handled by CSS
 
   useEffect(() => {
     if (!isVisible) return;
@@ -171,9 +166,18 @@ const TextType = ({
     showCursor && (
       <span
         ref={cursorRef}
-        className={`ml-1 inline-block opacity-100 ${shouldHideCursor ? "hidden" : ""} ${cursorClassName}`}
+        className={`ml-1 inline-block ${shouldHideCursor ? "hidden" : ""} ${cursorClassName}`}
+        style={{
+          animation: `cursor-blink ${cursorBlinkDuration * 2}s ease-in-out infinite`,
+        }}
       >
         {cursorCharacter}
+        <style jsx>{`
+          @keyframes cursor-blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+          }
+        `}</style>
       </span>
     ),
   );

@@ -1,8 +1,8 @@
 // pages/api/auth/callback.js
 
-import { supabase } from "@/lib/supabaseClient";
-import { getAccessToken, getMeInfo, getChannelsInfo } from "@/tools/fetchTools";
 import { serialize } from "cookie";
+import { supabase } from "@/lib/supabaseClient";
+import { getAccessToken, getChannelsInfo, getMeInfo } from "@/tools/fetchTools";
 
 export default async function handler(req, res) {
   const { code, state } = req.query;
