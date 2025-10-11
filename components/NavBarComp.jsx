@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import {
+import { 
   Navbar,
   NavbarBrand,
   NavbarContent,

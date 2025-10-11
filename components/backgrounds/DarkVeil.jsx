@@ -80,16 +80,19 @@ export default function DarkVeil({
   speed = 0.5,
   scanlineFrequency = 0,
   warpAmount = 0,
-  resolutionScale = 1,
+  resolutionScale = 0.8, // Reduced default resolution for better performance
 }) {
   const ref = useRef(null);
   useEffect(() => {
     const canvas = ref.current;
     const parent = canvas.parentElement;
 
+    // Optimize renderer settings for performance
     const renderer = new Renderer({
-      dpr: Math.min(window.devicePixelRatio, 2),
+      dpr: Math.min(window.devicePixelRatio, 1.5), // Reduced DPR for better performance
       canvas,
+      antialias: false, // Disable antialiasing for better performance
+      powerPreference: "high-performance",
     });
 
     const gl = renderer.gl;
@@ -123,20 +126,26 @@ export default function DarkVeil({
 
     const start = performance.now();
     let frame = 0;
+    let lastTime = 0;
+    const targetFPS = 30; // Limit to 30 FPS for better performance
+    const frameInterval = 1000 / targetFPS;
 
-    const loop = () => {
-      program.uniforms.uTime.value =
-        ((performance.now() - start) / 1000) * speed;
-      program.uniforms.uHueShift.value = hueShift;
-      program.uniforms.uNoise.value = noiseIntensity;
-      program.uniforms.uScan.value = scanlineIntensity;
-      program.uniforms.uScanFreq.value = scanlineFrequency;
-      program.uniforms.uWarp.value = warpAmount;
-      renderer.render({ scene: mesh });
+    const loop = (currentTime) => {
+      if (currentTime - lastTime >= frameInterval) {
+        program.uniforms.uTime.value =
+          ((performance.now() - start) / 1000) * speed;
+        program.uniforms.uHueShift.value = hueShift;
+        program.uniforms.uNoise.value = noiseIntensity;
+        program.uniforms.uScan.value = scanlineIntensity;
+        program.uniforms.uScanFreq.value = scanlineFrequency;
+        program.uniforms.uWarp.value = warpAmount;
+        renderer.render({ scene: mesh });
+        lastTime = currentTime;
+      }
       frame = requestAnimationFrame(loop);
     };
 
-    loop();
+    loop(performance.now());
 
     return () => {
       cancelAnimationFrame(frame);

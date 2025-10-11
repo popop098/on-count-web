@@ -6,9 +6,9 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { NavBarComp } from "@/components/NavBarComp";
 import { useEffect } from "react";
 import useUserStore, { useUser } from "@/store/userStore";
+import { usePerformanceMonitoring, useResourceTiming } from "@/hooks/usePerformance";
 import localFont from "next/font/local";
 import Image from "next/image";
-import * as ChannelService from '@channel.io/channel-web-sdk-loader';
 import OnCountLogo from "@/public/icon.png";
 import {useRouter} from "next/router";
 const pretendard = localFont({
@@ -17,16 +17,28 @@ const pretendard = localFont({
   variable: "--font-pretendard",
     display: "swap",
 });
-ChannelService.loadScript()
 function MyApp({ Component, pageProps }) {
     const { setUser } = useUserStore();
   const user = useUser();
     const router = useRouter();
 
+    // Performance monitoring
+    usePerformanceMonitoring();
+    useResourceTiming();
+
     useEffect(()=>{
-        ChannelService.boot({
-            "pluginKey": "b5cd1ac0-3d25-4b09-bdac-70cced30c09e", // fill your plugin key
-        });
+        // Lazy load Channel.io to improve initial bundle size
+        const loadChannelIO = async () => {
+            const ChannelService = await import('@channel.io/channel-web-sdk-loader');
+            await ChannelService.loadScript();
+            ChannelService.boot({
+                "pluginKey": "b5cd1ac0-3d25-4b09-bdac-70cced30c09e",
+            });
+        };
+        
+        // Load Channel.io after a delay to not block initial render
+        const timer = setTimeout(loadChannelIO, 2000);
+        return () => clearTimeout(timer);
     },[])
     useEffect(() => {
         const fetchUser = async () => {

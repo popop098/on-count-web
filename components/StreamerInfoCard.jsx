@@ -1,7 +1,8 @@
 import { Button, Card, CardBody, CardHeader } from "@heroui/react";
 import { router } from "next/client";
 import Image from "next/image";
-export const StreamerInfoCard = ({
+import { memo } from "react";
+export const StreamerInfoCard = memo(({
   channelName,
   channelImageUrl,
   channelUrl,
@@ -15,6 +16,10 @@ export const StreamerInfoCard = ({
             src={channelImageUrl}
             style={{ objectFit: "cover" }}
             fill
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Cp5c8m4eCOoEOlNfIkr9P6UEe3lSRWlXJhvnmOyVDIJMsQqLCqRgFQO2BjpSPnHlZrjlCXbFSJZNyGMHBUjBz7g8EfNKKHdOGRdpNyFCqCWOAMDuTgADuTgCgr//2Q=="
+            sizes="150px"
           />
         </div>
         <CardHeader className="pb-0 pt-2 px-4 flex justify-center">
@@ -31,4 +36,4 @@ export const StreamerInfoCard = ({
       </CardBody>
     </Card>
   );
-};
+});
