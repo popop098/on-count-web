@@ -1,17 +1,20 @@
 import { NextSeo } from 'next-seo';
 import { Button, Input, Spinner, Switch } from "@heroui/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import useSWR from "swr";
 import ContainerBox from "@/components/ContainerBox";
-import { StreamerInfoCard } from "@/components/StreamerInfoCard";
-import TextType from "@/components/TextType";
 import { swrFetcher } from "@/tools/fetchTools";
 import dynamic from "next/dynamic";
-import {Suspense} from "react";
-const DarkVeil = dynamic(()=>import("@/components/backgrounds/DarkVeil"),{
-    ssr: true,
-})
+
+// Lazy load heavy components
+const DarkVeil = dynamic(() => import("@/components/backgrounds/DarkVeil"), {
+  ssr: false, // Disable SSR for WebGL component
+  loading: () => <div className="w-full h-full bg-gradient-to-br from-purple-900 to-blue-900" />
+});
+
+const StreamerInfoCard = lazy(() => import("@/components/StreamerInfoCard"));
+const TextType = lazy(() => import("@/components/TextType"));
 
 export default function Index() {
   const { data, isLoading, isValidating } = useSWR(
