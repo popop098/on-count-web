@@ -291,8 +291,16 @@ export default function StreamerPage({ channelId, channelData }) {
               height: 630,
               alt: `${channelData?.channelName || '스트리머'} OG 이미지`,
             },
+            // Fallback small icon for platform "icon" slot
+            {
+              url: 'https://on-count.kr/icon.png',
+              width: 500,
+              height: 500,
+              alt: '온카운트 아이콘',
+            },
           ],
         }}
+        twitter={{ cardType: 'summary_large_image' }}
       />
       {isEnabledUpAnimation && (
         <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-20 w-96 h-96 ">
