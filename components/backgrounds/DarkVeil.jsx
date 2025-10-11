@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef } from "react";
 import { Mesh, Program, Renderer, Triangle, Vec2 } from "ogl";
 
@@ -97,14 +98,21 @@ export default function DarkVeil({
     if (!parent) return;
 
     // Performance optimizations
-    const dpr = Math.min(window.devicePixelRatio, 1.5); // Limit DPR for better performance
-    
-    const renderer = new Renderer({
-      dpr,
-      canvas,
-      alpha: false, // Disable alpha for better performance
-      antialias: false, // Disable antialiasing for better performance
-    });
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5); // Limit DPR for better performance
+
+    let renderer;
+    try {
+      renderer = new Renderer({
+        dpr,
+        canvas,
+        alpha: false, // Disable alpha for better performance
+        antialias: false, // Disable antialiasing for better performance
+      });
+    } catch (e) {
+      // Graceful fallback when WebGL is not available
+      canvas.style.background = "linear-gradient(135deg,#0f172a,#1e293b)";
+      return;
+    }
 
     const gl = renderer.gl;
     const geometry = new Triangle(gl);
@@ -220,5 +228,11 @@ export default function DarkVeil({
     resolutionScale,
   ]);
 
-  return <canvas ref={ref} className="w-full h-full block" style={{ willChange: 'transform' }} />;
+  return (
+    <canvas
+      ref={ref}
+      className="w-full h-full block"
+      style={{ willChange: "transform", position: "absolute", inset: 0 }}
+    />
+  );
 }

@@ -95,7 +95,7 @@ export default function Index() {
         canonical="https://on-count.kr/"
       />
       <ContainerBox>
-          <div style={{ width: "100%", height: "600px", position: "relative" }}>
+          <div style={{ width: "100%", height: "600px", position: "relative", overflow: "hidden" }}>
             <DarkVeil />
           </div>
         <TextType
