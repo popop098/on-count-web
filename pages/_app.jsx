@@ -8,7 +8,6 @@ import { useEffect } from "react";
 import useUserStore, { useUser } from "@/store/userStore";
 import localFont from "next/font/local";
 import Image from "next/image";
-import * as ChannelService from '@channel.io/channel-web-sdk-loader';
 import OnCountLogo from "@/public/icon.png";
 import {useRouter} from "next/router";
 const pretendard = localFont({
@@ -17,17 +16,22 @@ const pretendard = localFont({
   variable: "--font-pretendard",
     display: "swap",
 });
-ChannelService.loadScript()
+// Channel.io is loaded lazily on the client
 function MyApp({ Component, pageProps }) {
     const { setUser } = useUserStore();
   const user = useUser();
     const router = useRouter();
 
-    useEffect(()=>{
-        ChannelService.boot({
-            "pluginKey": "b5cd1ac0-3d25-4b09-bdac-70cced30c09e", // fill your plugin key
-        });
-    },[])
+    useEffect(() => {
+        (async () => {
+            if (typeof window === 'undefined') return;
+            const { default: ChannelService } = await import('@channel.io/channel-web-sdk-loader');
+            ChannelService.loadScript();
+            ChannelService.boot({
+                pluginKey: 'b5cd1ac0-3d25-4b09-bdac-70cced30c09e',
+            });
+        })();
+    }, [])
     useEffect(() => {
         const fetchUser = async () => {
             try {

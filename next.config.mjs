@@ -9,7 +9,7 @@ const nextConfig = {
         hostname: "nng-phinf.pstatic.net",
       },
     ],
-    qualities: [100],
+    formats: ["image/avif", "image/webp"],
   },
   webpack: (config, { isServer: _isServer }) => {
     // Add a rule to handle .lottie files as raw assets (like file-loader)

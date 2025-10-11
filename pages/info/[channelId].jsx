@@ -4,6 +4,7 @@ import { memo, useEffect, useState } from "react";
 import useSWR from "swr";
 import { getChannelsInfo, swrFetcher } from "@/tools/fetchTools";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import NumberFlow, { continuous } from "@number-flow/react";
 import {
   Accordion,
@@ -22,14 +23,10 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useUser } from "@/store/userStore";
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
-import axios from "axios";
 import { Slide, toast, ToastContainer } from "react-toastify";
-import Lottie from "react-lottie-player";
-import RocketLaunch from "@/public/assets/RocketLaunch.json";
-import { supabase } from "@/lib/supabaseClient";
-import {c} from "react/compiler-runtime";
+// Supabase client is imported dynamically in getServerSideProps to avoid build-time env issues
+
+const Lottie = dynamic(() => import("react-lottie-player"), { ssr: false });
 
 const FollowerCount = memo(({ count }) => (
   <NumberFlow value={count} plugins={[continuous]} willChange />
@@ -163,9 +160,22 @@ export default function StreamerPage({ channelId, channelData }) {
   const [enabledSoundEffect, setEnabledSoundEffect] = useState(true);
   const [isEnabledUpAnimation, setIsEnabledUpAnimation] = useState(false);
   const [isEnabledDownAnimation, setIsEnabledDownAnimation] = useState(false);
+  const [rocketData, setRocketData] = useState(null);
+
+  useEffect(() => {
+    if (isEnabledUpAnimation && !rocketData) {
+      fetch('/assets/RocketLaunch.json')
+        .then((res) => res.json())
+        .then((json) => setRocketData(json))
+        .catch(() => {});
+    }
+  }, [isEnabledUpAnimation, rocketData]);
   const handleSubscribe = async () => {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") return false;
+
+    const { initializeApp } = await import("firebase/app");
+    const { getMessaging, getToken } = await import("firebase/messaging");
 
     const firebaseApp = initializeApp({
       apiKey: "AIzaSyBwMRuuJ-UQIU98u5jx_plZUeEJMBfyScs",
@@ -177,47 +187,49 @@ export default function StreamerPage({ channelId, channelData }) {
       measurementId: "G-PS481MY3B3",
     });
 
-    const messaging = getMessaging(firebaseApp);
-
-    getToken(messaging, {
-      vapidKey:
-        "BNwPHj1YdMqN0nJ64m8E144vxLHJ5xQzQDcxLp01kswYTJvyTyccwwPtAIVr3p-lKVOs8d3bbSkNodMM-yLxJI0",
-    })
-      .then((currentToken) => {
-        if (currentToken) {
-          console.log(currentToken);
-          axios
-            .post("/api/subscribe", {
-              channel_id: channelId,
-              user_id: user.channelId,
-              topic: "streamer_subscribe",
-              fcm_token: currentToken,
-            })
-            .then((data) => {
-              if (data.status !== 200) return null;
-              mutate();
-            });
-        } else {
-          console.log(
-            "No registration token available. Request permission to generate one.",
-          );
-        }
-      })
-      .catch((err) => {
-        console.log("An error occurred while retrieving token. ", err);
+    try {
+      const messaging = getMessaging(firebaseApp);
+      const currentToken = await getToken(messaging, {
+        vapidKey:
+          "BNwPHj1YdMqN0nJ64m8E144vxLHJ5xQzQDcxLp01kswYTJvyTyccwwPtAIVr3p-lKVOs8d3bbSkNodMM-yLxJI0",
       });
+      if (currentToken) {
+        const resp = await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            channel_id: channelId,
+            user_id: user.channelId,
+            topic: "streamer_subscribe",
+            fcm_token: currentToken,
+          }),
+        });
+        if (resp.ok) {
+          await mutate();
+        }
+      } else {
+        console.log(
+          "No registration token available. Request permission to generate one.",
+        );
+      }
+    } catch (err) {
+      console.log("An error occurred while retrieving token. ", err);
+    }
   };
 
   const handleUnsubscribe = async () => {
-    const resp = await axios.delete("/api/subscribe", {
-      data: {
+    const resp = await fetch("/api/subscribe", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         channel_id: channelId,
         user_id: user.channelId,
         topic: "streamer_subscribe",
-      },
+      }),
     });
-    if (resp.status !== 200)
+    if (!resp.ok) {
       return alert("무엇인가 잘못되었어요. 잠시후 다시 시도해주세요.");
+    }
     await mutate();
   };
 
@@ -292,10 +304,10 @@ export default function StreamerPage({ channelId, channelData }) {
           ],
         }}
       />
-      {isEnabledUpAnimation && (
+      {isEnabledUpAnimation && rocketData && (
         <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-20 w-96 h-96 ">
           <Lottie
-            animationData={RocketLaunch}
+            animationData={rocketData}
             loop={false}
             play
             autoplay
@@ -423,7 +435,6 @@ export default function StreamerPage({ channelId, channelData }) {
                 <Image
                   alt={`${data?.channelName}Image`}
                   src={data?.channelImageUrl}
-                  quality={100}
                   layout="fill"
                   objectFit="cover"
                 />
@@ -527,6 +538,14 @@ export async function getServerSideProps({ params }) {
   const { channelId } = params;
 
   try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return { props: { channelId, channelData: null } };
+    }
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
     const { data: profile, error } = await supabase
       .from("profiles")
       .select("*")

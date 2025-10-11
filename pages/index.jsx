@@ -8,10 +8,10 @@ import { StreamerInfoCard } from "@/components/StreamerInfoCard";
 import TextType from "@/components/TextType";
 import { swrFetcher } from "@/tools/fetchTools";
 import dynamic from "next/dynamic";
-import {Suspense} from "react";
-const DarkVeil = dynamic(()=>import("@/components/backgrounds/DarkVeil"),{
-    ssr: true,
-})
+const DarkVeil = dynamic(() => import("@/components/backgrounds/DarkVeil"), {
+    ssr: false,
+    loading: () => <Spinner color="primary" size="lg" />,
+});
 
 export default function Index() {
   const { data, isLoading, isValidating } = useSWR(
@@ -100,11 +100,9 @@ export default function Index() {
         }}
       />
       <ContainerBox>
-          <Suspense fallback={<Spinner color="primary" size="lg" />}>
-            <div style={{ width: "100%", height: "600px", position: "relative" }}>
-              <DarkVeil />
-            </div>
-          </Suspense>
+          <div style={{ width: "100%", height: "600px", position: "relative" }}>
+            <DarkVeil />
+          </div>
         <TextType
           text={[
             "실시간 팔로워 현황 검색은?",
