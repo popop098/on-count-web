@@ -27,25 +27,26 @@ export default async function handler(req) {
           color: '#ffffff',
           fontFamily: 'Pretendard, Noto Sans KR, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
           padding: '48px 64px',
+          position: 'relative',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 48 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 56 }}>
           <div
             style={{
-              width: 360,
-              height: 360,
-              borderRadius: 32,
+              width: 520,
+              height: 320,
+              borderRadius: 24,
               overflow: 'hidden',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.45)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.45)',
               display: 'flex',
             }}
           >
-            <img src={img} alt="channel" width={360} height={360} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+            <img src={img} alt="channel" width={520} height={320} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
           </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ fontSize: 72, fontWeight: 800 }}>{channelName}</div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ fontSize: 88, fontWeight: 900, lineHeight: 1.1, maxWidth: 620 }}>{channelName}</div>
               {verified && (
                 <div style={{ display: 'flex' }}>
                   <div
@@ -67,13 +68,26 @@ export default async function handler(req) {
                 </div>
               )}
             </div>
-            <div style={{ fontSize: 42, color: '#cbd5e1', marginTop: 8 }}>{followerText}</div>
+            <div style={{ fontSize: 44, color: '#cbd5e1', marginTop: 12, fontWeight: 600 }}>{followerText}</div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-          <div style={{ fontSize: 28, color: '#94a3b8' }}>on-count.kr</div>
-          <div style={{ fontSize: 20, color: '#64748b', marginTop: 4 }}>실시간 스트리머 팔로워 현황</div>
+        <div style={{ position: 'absolute', right: 64, bottom: 48, display: 'flex' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: 4,
+              background: 'rgba(15,23,42,0.65)',
+              border: '1px solid #334155',
+              padding: '12px 16px',
+              borderRadius: 12,
+            }}
+          >
+            <div style={{ fontSize: 28, color: '#e2e8f0', fontWeight: 700 }}>on-count.kr</div>
+            <div style={{ fontSize: 20, color: '#94a3b8' }}>실시간 스트리머 팔로워 현황</div>
+          </div>
         </div>
       </div>
     ),
