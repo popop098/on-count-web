@@ -4,20 +4,35 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import ContainerBox from "@/components/ContainerBox";
-import { StreamerInfoCard } from "@/components/StreamerInfoCard";
-import TextType from "@/components/TextType";
+const StreamerInfoCard = dynamic(() => import("@/components/StreamerInfoCard").then(mod => ({ default: mod.StreamerInfoCard })), {
+  loading: () => <div className="w-full h-32 bg-gray-200 animate-pulse rounded-lg" />,
+  ssr: true
+});
+const TextType = dynamic(() => import("@/components/TextType"), {
+  loading: () => <div className="h-12 bg-gray-200 animate-pulse rounded" />,
+  ssr: false
+});
 import { swrFetcher } from "@/tools/fetchTools";
 import dynamic from "next/dynamic";
 import {Suspense} from "react";
 const DarkVeil = dynamic(()=>import("@/components/backgrounds/DarkVeil"),{
-    ssr: true,
+    ssr: false,
+    loading: () => <div className="w-full h-full bg-gradient-to-br from-purple-900/20 to-blue-900/20 animate-pulse" />
 })
 
 export default function Index() {
   const { data, isLoading, isValidating } = useSWR(
     "/api/get-channels-data",
     swrFetcher,
-    { revalidateOnFocus: false },
+    { 
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 300000, // 5 minutes
+      dedupingInterval: 60000, // 1 minute
+      errorRetryCount: 2,
+      errorRetryInterval: 5000,
+      loadingTimeout: 10000,
+    },
   );
   const [searchInput, setSearchInput] = useState("");
   const [enabledSaveSearchHistory, setEnabledSaveSearchHistory] =

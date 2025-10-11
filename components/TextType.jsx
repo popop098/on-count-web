@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, createElement, useEffect, useMemo, useRef, useState } from "react";
-import { gsap } from "gsap";
+import { useCallback, createElement, useEffect, useMemo, useRef, useState, memo } from "react";
+import gsap from "gsap/dist/gsap";
 
 const TextType = ({
   text,
@@ -179,4 +179,4 @@ const TextType = ({
   );
 };
 
-export default TextType;
+export default memo(TextType);
