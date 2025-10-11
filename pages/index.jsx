@@ -108,11 +108,9 @@ export default function Index() {
         }}
       />
       <ContainerBox>
-          <Suspense fallback={<Spinner color="primary" size="lg" />}>
-            <div style={{ width: "100%", height: "600px", position: "relative" }}>
-              <DarkVeil />
-            </div>
-          </Suspense>
+          <div style={{ width: "100%", height: "600px", position: "relative" }}>
+            <DarkVeil />
+          </div>
         <TextType
           text={[
             "실시간 팔로워 현황 검색은?",
