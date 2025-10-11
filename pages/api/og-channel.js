@@ -18,7 +18,8 @@ export default async function handler(req) {
   const nameLen = (channelName || '').length;
   const nameFontSize = nameLen > 22 ? 56 : nameLen > 16 ? 66 : nameLen > 12 ? 76 : 86;
   const nameMaxWidth = 720; // slightly wider safe width
-  const nameWrapped = (channelName || '').split('').join('\u200B');
+  const firstLine = (channelName || '').slice(0, 5);
+  const secondLine = (channelName || '').slice(5);
 
   return new ImageResponse(
     (
@@ -51,8 +52,13 @@ export default async function handler(req) {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <div style={{ fontSize: nameFontSize, fontWeight: 900, lineHeight: 1.18, maxWidth: nameMaxWidth, marginRight: 8, padding: '8px 12px 6px 12px', borderRadius: 8, wordBreak: 'keep-all', overflow: 'hidden' }}>{nameWrapped}</div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', maxWidth: nameMaxWidth }}>
+                <div style={{ fontSize: nameFontSize, fontWeight: 900, lineHeight: 1.18, padding: '8px 12px 2px 12px', borderRadius: 8 }}>{firstLine}</div>
+                {secondLine && (
+                  <div style={{ fontSize: nameFontSize, fontWeight: 900, lineHeight: 1.18, padding: '2px 12px 6px 12px', borderRadius: 8 }}>{secondLine}</div>
+                )}
+              </div>
               {verified && (
                 <div style={{ display: 'flex' }}>
                   <div
