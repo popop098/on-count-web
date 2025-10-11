@@ -1,23 +1,26 @@
-import { NextSeo } from 'next-seo';
-import { memo, useEffect, useState } from "react";
-import useSWR from "swr";
 import {
-    Alert,
-    Avatar,
-    Button,
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalFooter,
-    ModalHeader, Select, SelectItem,
-    Spinner,
-    useDisclosure,
+  Alert,
+  Avatar,
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Spinner,
+  useDisclosure,
 } from "@heroui/react";
 import NumberFlow, { continuous } from "@number-flow/react";
+import { NextSeo } from "next-seo";
+import { memo, useEffect, useState } from "react";
+import useSWR from "swr";
 import ContainerBox from "@/components/ContainerBox";
 import { StreamerInfoCard } from "@/components/StreamerInfoCard";
 import { useUser } from "@/store/userStore";
 import { swrFetcher } from "@/tools/fetchTools";
+
 const FollowerCount = memo(({ count }) => (
   <NumberFlow value={count} plugins={[continuous]} willChange />
 ));
@@ -170,7 +173,7 @@ export default function Me() {
                 <div className="w-2 h-2 bg-danger rounded-full" />
               )}
             </div>
-                <p className="text-[7rem] font-extrabold">
+            <p className="text-[7rem] font-extrabold">
               <FollowerCount count={!data ? 0 : data.currFollowerCount} />
             </p>
           </div>
@@ -190,12 +193,18 @@ export default function Me() {
           ) : (
             <p className="text-lg font-semibold">구독 정보가 없어요.</p>
           )}
-            <div className="h-1 w-full rounded-3xl bg-gray-500" />
-            <p className="text-lg font-semibold">오버레이 설정</p>
-            <Button color="primary" variant="shadow" onPress={()=>window.open('https://on-count-overlay.vercel.app/', '_blank')}>
-                신규 오버레이 페이지
-            </Button>
-            <div className="h-1 w-full rounded-3xl bg-gray-500" />
+          <div className="h-1 w-full rounded-3xl bg-gray-500" />
+          <p className="text-lg font-semibold">오버레이 설정</p>
+          <Button
+            color="primary"
+            variant="shadow"
+            onPress={() =>
+              window.open("https://on-count-overlay.vercel.app/", "_blank")
+            }
+          >
+            신규 오버레이 페이지
+          </Button>
+          <div className="h-1 w-full rounded-3xl bg-gray-500" />
           <Button
             color={isPublic ? "warning" : "primary"}
             onPress={onOpen}

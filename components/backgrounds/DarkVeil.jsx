@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import { Mesh, Program, Renderer, Triangle, Vec2 } from "ogl";
+import { useEffect, useRef } from "react";
 
 const vertex = `
 attribute vec2 position;
@@ -80,7 +80,7 @@ export default function DarkVeil({
   speed = 0.5,
   scanlineFrequency = 0,
   warpAmount = 0,
-  resolutionScale = 1,
+  resolutionScale = 0.75,
 }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function DarkVeil({
     const parent = canvas.parentElement;
 
     const renderer = new Renderer({
-      dpr: Math.min(window.devicePixelRatio, 2),
+      dpr: Math.min(window.devicePixelRatio, 1.5),
       canvas,
     });
 

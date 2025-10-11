@@ -1,4 +1,5 @@
 import withPWAInit from "@ducanh2912/next-pwa";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -9,7 +10,11 @@ const nextConfig = {
         hostname: "nng-phinf.pstatic.net",
       },
     ],
-    qualities: [100],
+    qualities: [75, 90],
+    formats: ["image/webp"],
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
   },
   webpack: (config, { isServer: _isServer }) => {
     // Add a rule to handle .lottie files as raw assets (like file-loader)
@@ -26,12 +31,12 @@ const nextConfig = {
 };
 
 const withPWA = withPWAInit({
-    dest: 'public',
-    register: true,
-    skipWaiting: true,
-    disable: process.env.NODE_ENV === 'development',
-    fallbacks: {
-        document: '/_offline', // will be created later
-    },
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+  fallbacks: {
+    document: "/_offline", // will be created later
+  },
 });
 export default withPWA(nextConfig);

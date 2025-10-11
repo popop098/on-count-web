@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
 import {
   Button,
   Dropdown,
@@ -7,6 +5,8 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@heroui/react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export const Dark = (props) => (
   <svg

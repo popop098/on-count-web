@@ -1,17 +1,20 @@
-import { NextSeo } from 'next-seo';
 import { Button, Input, Spinner, Switch } from "@heroui/react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { NextSeo } from "next-seo";
+import { Suspense, useEffect, useState } from "react";
 import useSWR from "swr";
 import ContainerBox from "@/components/ContainerBox";
 import { StreamerInfoCard } from "@/components/StreamerInfoCard";
 import TextType from "@/components/TextType";
 import { swrFetcher } from "@/tools/fetchTools";
-import dynamic from "next/dynamic";
-import {Suspense} from "react";
-const DarkVeil = dynamic(()=>import("@/components/backgrounds/DarkVeil"),{
-    ssr: true,
-})
+
+const DarkVeil = dynamic(() => import("@/components/backgrounds/DarkVeil"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-gradient-to-b from-transparent to-primary/10" />
+  ),
+});
 
 export default function Index() {
   const { data, isLoading, isValidating } = useSWR(
@@ -74,10 +77,10 @@ export default function Index() {
 
     setEnabledSaveSearchHistory(initialSaveHistory);
     setSearchHistory(initialSearchHistory);
-
   }, []);
-  const title = '온카운트 - 실시간 스트리머 팔로워 현황';
-  const description = '좋아하는 스트리머의 팔로워 수를 실시간으로 확인하고 검색하세요.';
+  const title = "온카운트 - 실시간 스트리머 팔로워 현황";
+  const description =
+    "좋아하는 스트리머의 팔로워 수를 실시간으로 확인하고 검색하세요.";
 
   return (
     <>
@@ -86,7 +89,7 @@ export default function Index() {
         description={description}
         canonical="https://on-count.kr/"
         openGraph={{
-          url: 'https://on-count.kr/',
+          url: "https://on-count.kr/",
           title: title,
           description: description,
           images: [
@@ -94,17 +97,17 @@ export default function Index() {
               url: `https://on-count.kr/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`,
               width: 1200,
               height: 630,
-              alt: '온카운트 홈',
+              alt: "온카운트 홈",
             },
           ],
         }}
       />
       <ContainerBox>
-          <Suspense fallback={<Spinner color="primary" size="lg" />}>
-            <div style={{ width: "100%", height: "600px", position: "relative" }}>
-              <DarkVeil />
-            </div>
-          </Suspense>
+        <Suspense fallback={<Spinner color="primary" size="lg" />}>
+          <div style={{ width: "100%", height: "600px", position: "relative" }}>
+            <DarkVeil />
+          </div>
+        </Suspense>
         <TextType
           text={[
             "실시간 팔로워 현황 검색은?",
@@ -229,25 +232,24 @@ export default function Index() {
               온-카운트내에 등록과 공개상태인 스트리머 리스트에요.
             </p>
           </div>
-            <div className="flex flex-wrap items-center gap-1 w-full">
-                {isLoading || isValidating || !data ? (
-                    <div className="w-full h-64 flex flex-col items-center justify-center">
-                        <Spinner color="primary" size="lg" />
-                    </div>
-                ) : (
-                    data.map((item) => (
-                        <StreamerInfoCard
-                            key={item.channel_id}
-                            channelName={item.channel_name}
-                            channelImageUrl={item.channel_image_url}
-                            channelUrl={`/info/${item.channel_id}`}
-                            channelFollwerCount={item.follower_count}
-                            channelVerificationMark={item.verified_mark}
-                        />
-                    ))
-                )}
-            </div>
-
+          <div className="flex flex-wrap items-center gap-1 w-full">
+            {isLoading || isValidating || !data ? (
+              <div className="w-full h-64 flex flex-col items-center justify-center">
+                <Spinner color="primary" size="lg" />
+              </div>
+            ) : (
+              data.map((item) => (
+                <StreamerInfoCard
+                  key={item.channel_id}
+                  channelName={item.channel_name}
+                  channelImageUrl={item.channel_image_url}
+                  channelUrl={`/info/${item.channel_id}`}
+                  channelFollwerCount={item.follower_count}
+                  channelVerificationMark={item.verified_mark}
+                />
+              ))
+            )}
+          </div>
         </div>
       </ContainerBox>
     </>

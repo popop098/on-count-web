@@ -1,10 +1,3 @@
-import { NextSeo } from 'next-seo';
-import { useRouter } from "next/router";
-import { memo, useEffect, useState } from "react";
-import useSWR from "swr";
-import { getChannelsInfo, swrFetcher } from "@/tools/fetchTools";
-import Image from "next/image";
-import NumberFlow, { continuous } from "@number-flow/react";
 import {
   Accordion,
   AccordionItem,
@@ -21,15 +14,19 @@ import {
   Tooltip,
   useDisclosure,
 } from "@heroui/react";
-import { useUser } from "@/store/userStore";
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
+import NumberFlow, { continuous } from "@number-flow/react";
 import axios from "axios";
-import { Slide, toast, ToastContainer } from "react-toastify";
-import Lottie from "react-lottie-player";
-import RocketLaunch from "@/public/assets/RocketLaunch.json";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import { NextSeo } from "next-seo";
+import { memo, useEffect, useState } from "react";
+import { Slide, ToastContainer, toast } from "react-toastify";
+import useSWR from "swr";
 import { supabase } from "@/lib/supabaseClient";
-import {c} from "react/compiler-runtime";
+import { useUser } from "@/store/userStore";
+import { getChannelsInfo, swrFetcher } from "@/tools/fetchTools";
+
+const Lottie = dynamic(() => import("react-lottie-player"), { ssr: false });
 
 const FollowerCount = memo(({ count }) => (
   <NumberFlow value={count} plugins={[continuous]} willChange />
@@ -140,32 +137,42 @@ export const SoundOffFilled = (props) => (
   </svg>
 );
 export default function StreamerPage({ channelId, channelData }) {
-  const router = useRouter();
   const user = useUser();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { data, error, isLoading, isValidating } = useSWR(
+  const { data } = useSWR(
     `/api/channel-info?mode=followers&channelid=${channelId}`,
     swrFetcher,
-    { 
+    {
       fallbackData: channelData,
-      refreshInterval: 3000, 
-      refreshWhenHidden: true 
+      refreshInterval: 3000,
+      refreshWhenHidden: true,
     },
   );
-  const {
-    data: meSubscribeData,
-    isLoading: meSubscribeDataIsLoading,
-    isValidating: meSubscribeDataIsValidating,
-    mutate,
-  } = useSWR(user && "/api/subscribe", swrFetcher);
+  const { data: meSubscribeData, mutate } = useSWR(
+    user && "/api/subscribe",
+    swrFetcher,
+  );
   const [count, setCount] = useState(0);
   const [followerColor, setFollowerColor] = useState("inherit");
   const [enabledSoundEffect, setEnabledSoundEffect] = useState(true);
   const [isEnabledUpAnimation, setIsEnabledUpAnimation] = useState(false);
-  const [isEnabledDownAnimation, setIsEnabledDownAnimation] = useState(false);
+  const [rocketLaunchData, setRocketLaunchData] = useState(null);
+
+  useEffect(() => {
+    if (isEnabledUpAnimation && !rocketLaunchData) {
+      import("@/public/assets/RocketLaunch.json").then((data) => {
+        setRocketLaunchData(data.default);
+      });
+    }
+  }, [isEnabledUpAnimation, rocketLaunchData]);
+
   const handleSubscribe = async () => {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") return false;
+
+    // Lazy load Firebase
+    const { initializeApp } = await import("firebase/app");
+    const { getMessaging, getToken } = await import("firebase/messaging");
 
     const firebaseApp = initializeApp({
       apiKey: "AIzaSyBwMRuuJ-UQIU98u5jx_plZUeEJMBfyScs",
@@ -267,10 +274,10 @@ export default function StreamerPage({ channelId, channelData }) {
     if (newCount !== undefined) {
       setCount(newCount);
     }
-  }, [data, count, setFollowerColor, enabledSoundEffect]);
+  }, [data, count, enabledSoundEffect]);
 
-  const title = `${channelData?.channelName || '스트리머'} - 실시간 팔로워`;
-  const description = `${channelData?.channelName || '스트리머'}님의 실시간 팔로워 수를 확인하세요.`;
+  const title = `${channelData?.channelName || "스트리머"} - 실시간 팔로워`;
+  const description = `${channelData?.channelName || "스트리머"}님의 실시간 팔로워 수를 확인하세요.`;
 
   return (
     <>
@@ -284,18 +291,18 @@ export default function StreamerPage({ channelId, channelData }) {
           description: description,
           images: [
             {
-              url: `https://on-count.kr/api/og?title=${encodeURIComponent(channelData?.channelName || '스트리머')}&description=${encodeURIComponent('실시간 팔로워 현황')}`,
+              url: `https://on-count.kr/api/og?title=${encodeURIComponent(channelData?.channelName || "스트리머")}&description=${encodeURIComponent("실시간 팔로워 현황")}`,
               width: 1200,
               height: 630,
-              alt: `${channelData?.channelName || '스트리머'} OG 이미지`,
+              alt: `${channelData?.channelName || "스트리머"} OG 이미지`,
             },
           ],
         }}
       />
-      {isEnabledUpAnimation && (
+      {isEnabledUpAnimation && rocketLaunchData && (
         <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-20 w-96 h-96 ">
           <Lottie
-            animationData={RocketLaunch}
+            animationData={rocketLaunchData}
             loop={false}
             play
             autoplay
@@ -321,7 +328,9 @@ export default function StreamerPage({ channelId, channelData }) {
         <ModalContent>
           {(onClose) => (
             <>
-              {meSubscribeData?.find((item) => item.channel_id === channelId) ? (
+              {meSubscribeData?.find(
+                (item) => item.channel_id === channelId,
+              ) ? (
                 <ModalHeader className="flex items-center gap-1">
                   '{data?.channelName}'님을{" "}
                   <span className="text-warning underline underline-offset-4">
@@ -338,7 +347,9 @@ export default function StreamerPage({ channelId, channelData }) {
                   하시겠어요?
                 </ModalHeader>
               )}
-              {meSubscribeData?.find((item) => item.channel_id === channelId) ? (
+              {meSubscribeData?.find(
+                (item) => item.channel_id === channelId,
+              ) ? (
                 <ModalBody>
                   <p>
                     만약 구독 해지하실 경우 특정 팔로워 단위(예: 100명, 1000명,
@@ -414,18 +425,17 @@ export default function StreamerPage({ channelId, channelData }) {
       <div className="w-[80%] h-fit mx-auto flex flex-col items-center justify-center gap-4">
         <div className="flex flex-col items-center justify-center gap-4 my-30">
           {!data ? (
-            <>
-              <Spinner color="primary" size="lg" />
-            </>
+            <Spinner color="primary" size="lg" />
           ) : (
             <>
               <div className="w-[150px] h-[150px] rounded-full overflow-hidden relative">
                 <Image
                   alt={`${data?.channelName}Image`}
                   src={data?.channelImageUrl}
-                  quality={100}
+                  quality={75}
                   layout="fill"
                   objectFit="cover"
+                  priority
                 />
               </div>
               <div className="flex flex-col items-center justify-center gap-1">
@@ -465,10 +475,8 @@ export default function StreamerPage({ channelId, channelData }) {
                         onPress={onOpen}
                         isLoading={isOpen}
                       >
-                        {Boolean(
-                          meSubscribeData?.find(
-                            (item) => item.channel_id === channelId,
-                          ),
+                        {meSubscribeData?.find(
+                          (item) => item.channel_id === channelId,
                         ) ? (
                           <BellGold />
                         ) : (
@@ -542,7 +550,8 @@ export async function getServerSideProps({ params }) {
       return { props: { channelId, channelData: channelInfo } };
     }
 
-    const { follower_count, channel_image_url, verified_mark, is_public } = profile;
+    const { follower_count, channel_image_url, verified_mark, is_public } =
+      profile;
     const { followerCount, channelName } = channelInfo;
 
     const channelData = {

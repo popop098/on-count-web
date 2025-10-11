@@ -1,33 +1,33 @@
-import { useState } from "react";
-import { usePathname } from "next/navigation";
-import Image from "next/image";
 import {
+  Avatar,
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownSection,
+  DropdownTrigger,
+  Link,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Navbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  Link,
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Dropdown,
-  DropdownTrigger,
-  Avatar,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-  NavbarMenuToggle,
   NavbarMenu,
   NavbarMenuItem,
+  NavbarMenuToggle,
+  useDisclosure,
 } from "@heroui/react";
-import OnCountLogo from "@/public/icon.png";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import ChzzkLogo from "@/public/chzzk_Icon_02.png";
+import OnCountLogo from "@/public/icon.png";
 import { useUser } from "@/store/userStore";
-import {useRouter} from "next/router";
 
 const menuItems = [{ name: "메인", href: "/" }];
 
@@ -107,7 +107,7 @@ export const NavBarComp = () => {
               width={50}
               height={50}
               className="rounded-xl"
-              onClick={()=>router.push('/')}
+              onClick={() => router.push("/")}
             />
           </NavbarBrand>
         </NavbarContent>
