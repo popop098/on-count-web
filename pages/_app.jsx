@@ -4,7 +4,7 @@ import "@/styles/globals.css";
 import { HeroUIProvider } from "@heroui/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { NavBarComp } from "@/components/NavBarComp";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useUserStore, { useUser } from "@/store/userStore";
 import localFont from "next/font/local";
 import Image from "next/image";
@@ -36,6 +36,7 @@ function MyApp({ Component, pageProps }) {
     const { setUser } = useUserStore();
   const user = useUser();
     const router = useRouter();
+    const [isRouteLoading, setIsRouteLoading] = useState(false);
 
     useEffect(() => {
         // Load Channel.io only after user interaction or after a delay
@@ -71,6 +72,19 @@ function MyApp({ Component, pageProps }) {
         };
     }, [])
     useEffect(() => {
+        const handleStart = () => setIsRouteLoading(true);
+        const handleDone = () => setIsRouteLoading(false);
+
+        router.events.on('routeChangeStart', handleStart);
+        router.events.on('routeChangeComplete', handleDone);
+        router.events.on('routeChangeError', handleDone);
+        return () => {
+            router.events.off('routeChangeStart', handleStart);
+            router.events.off('routeChangeComplete', handleDone);
+            router.events.off('routeChangeError', handleDone);
+        };
+    }, [router.events])
+    useEffect(() => {
         const fetchUser = async () => {
             try {
                 const res = await fetch('/api/user');
@@ -90,6 +104,19 @@ function MyApp({ Component, pageProps }) {
       <PerformanceMonitor />
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <HeroUIProvider>
+          {isRouteLoading && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-black/30 border border-white/10">
+                <div className="w-10 h-10">
+                  <svg className="animate-spin w-10 h-10 text-primary" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
+                </div>
+                <p className="text-sm text-white/80">로딩 중...</p>
+              </div>
+            </div>
+          )}
           <DefaultSeo {...SEO} />
           <ErrorBoundary>
             <header className="sticky top-0 w-full z-50">
