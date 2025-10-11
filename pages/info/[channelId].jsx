@@ -29,11 +29,13 @@ import { Slide, toast, ToastContainer } from "react-toastify";
 import Lottie from "react-lottie-player";
 import RocketLaunch from "@/public/assets/RocketLaunch.json";
 import { supabase } from "@/lib/supabaseClient";
-import {c} from "react/compiler-runtime";
 
-const FollowerCount = memo(({ count }) => (
-  <NumberFlow value={count} plugins={[continuous]} willChange />
-));
+const FollowerCount = memo(({ count }) => {
+  if (count === undefined || count === null) {
+    return null;
+  }
+  return <NumberFlow value={count} plugins={[continuous]} willChange />;
+});
 FollowerCount.displayName = "FollowerCount";
 
 export const Warning = (props) => (

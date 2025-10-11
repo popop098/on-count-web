@@ -1,20 +1,25 @@
 import { NextSeo } from 'next-seo';
 import { Button, Input, Spinner, Switch } from "@heroui/react";
 import { useRouter } from "next/router";
-import { useEffect, useState, Suspense, lazy } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import ContainerBox from "@/components/ContainerBox";
 import { swrFetcher } from "@/tools/fetchTools";
 import dynamic from "next/dynamic";
 
-// Lazy load heavy components
+// Lazy load heavy components using Next.js dynamic imports
 const DarkVeil = dynamic(() => import("@/components/backgrounds/DarkVeil"), {
   ssr: false, // Disable SSR for WebGL component
   loading: () => <div className="w-full h-full bg-gradient-to-br from-purple-900 to-blue-900" />
 });
 
-const StreamerInfoCard = lazy(() => import("@/components/StreamerInfoCard"));
-const TextType = lazy(() => import("@/components/TextType"));
+const StreamerInfoCard = dynamic(() => import("@/components/StreamerInfoCard"), {
+  loading: () => <div className="w-full h-64 flex flex-col items-center justify-center"><Spinner color="primary" size="lg" /></div>
+});
+
+const TextType = dynamic(() => import("@/components/TextType"), {
+  loading: () => <div className="sm:text-3xl text-xl font-extrabold -my-90 z-0 text-white">로딩 중...</div>
+});
 
 export default function Index() {
   const { data, isLoading, isValidating } = useSWR(
@@ -108,22 +113,20 @@ export default function Index() {
               <DarkVeil />
             </div>
           </Suspense>
-        <Suspense fallback={<div className="sm:text-3xl text-xl font-extrabold -my-90 z-0 text-white">로딩 중...</div>}>
-          <TextType
-            text={[
-              "실시간 팔로워 현황 검색은?",
-              "온-카운트와 함께!",
-              "언제 어디서나 온-카운트.",
-            ]}
-            typingSpeed={100}
-            pauseDuration={1500}
-            showCursor
-            cursorCharacter="|"
-            textColors={["#ffffff"]}
-            className="sm:text-3xl text-xl font-extrabold -my-90 z-0"
-            cursorClassName="text-primary"
-          />
-        </Suspense>
+        <TextType
+          text={[
+            "실시간 팔로워 현황 검색은?",
+            "온-카운트와 함께!",
+            "언제 어디서나 온-카운트.",
+          ]}
+          typingSpeed={100}
+          pauseDuration={1500}
+          showCursor
+          cursorCharacter="|"
+          textColors={["#ffffff"]}
+          className="sm:text-3xl text-xl font-extrabold -my-90 z-0"
+          cursorClassName="text-primary"
+        />
         <div className="w-[60%] h-[22em] mx-auto flex flex-col items-center justify-center gap-4"></div>
         <div className="w-[65%] h-[25em] mx-auto flex flex-col items-center justify-center gap-4 z-0">
           <p className="font-extrabold text-lg sm:text-2xl text-primary">
@@ -240,18 +243,16 @@ export default function Index() {
                         <Spinner color="primary" size="lg" />
                     </div>
                 ) : (
-                    <Suspense fallback={<div className="w-full h-64 flex flex-col items-center justify-center"><Spinner color="primary" size="lg" /></div>}>
-                        {data.map((item) => (
-                            <StreamerInfoCard
-                                key={item.channel_id}
-                                channelName={item.channel_name}
-                                channelImageUrl={item.channel_image_url}
-                                channelUrl={`/info/${item.channel_id}`}
-                                channelFollwerCount={item.follower_count}
-                                channelVerificationMark={item.verified_mark}
-                            />
-                        ))}
-                    </Suspense>
+                    data.map((item) => (
+                        <StreamerInfoCard
+                            key={item.channel_id}
+                            channelName={item.channel_name}
+                            channelImageUrl={item.channel_image_url}
+                            channelUrl={`/info/${item.channel_id}`}
+                            channelFollwerCount={item.follower_count}
+                            channelVerificationMark={item.verified_mark}
+                        />
+                    ))
                 )}
             </div>
 
