@@ -93,19 +93,6 @@ export default function Index() {
         title="홈"
         description={description}
         canonical="https://on-count.kr/"
-        openGraph={{
-          url: 'https://on-count.kr/',
-          title: title,
-          description: description,
-          images: [
-            {
-              url: `https://on-count.kr/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`,
-              width: 1200,
-              height: 630,
-              alt: '온카운트 홈',
-            },
-          ],
-        }}
       />
       <ContainerBox>
           <div style={{ width: "100%", height: "600px", position: "relative" }}>

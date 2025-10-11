@@ -10,17 +10,17 @@ const SEO = {
     site_name: '온카운트',
     images: [
       {
-        url: 'https://on-count.kr/api/og?title=온카운트&description=실시간 스트리머 팔로워 현황',
+        url: 'https://on-count.kr/icon.png',
         width: 1200,
         height: 630,
-        alt: '온카운트 OG 이미지',
+        alt: '온카운트',
       },
     ],
   },
   twitter: {
     handle: '@handle',
     site: '@site',
-    cardType: 'summary_large_image',
+    cardType: 'summary',
   },
   additionalLinkTags: [
     {
