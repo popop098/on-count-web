@@ -12,6 +12,7 @@ import OnCountLogo from "@/public/icon.png";
 import {useRouter} from "next/router";
 import dynamic from "next/dynamic";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const pretendard = localFont({
   src: "../public/fonts/pretendard/PretendardVariable.woff2",
@@ -94,12 +95,16 @@ function MyApp({ Component, pageProps }) {
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <HeroUIProvider>
           <DefaultSeo {...SEO} />
-          <header className="sticky top-0 w-full z-50">
-              <NavBarComp />
-          </header>
-          <main className="overflow-x-hidden">
-            <Component {...pageProps} />
-          </main>
+          <ErrorBoundary>
+            <header className="sticky top-0 w-full z-50">
+                <NavBarComp />
+            </header>
+            <main className="overflow-x-hidden">
+              <ErrorBoundary>
+                <Component {...pageProps} />
+              </ErrorBoundary>
+            </main>
+          </ErrorBoundary>
             <footer className="w-full flex items-center justify-center py-3">
                 <div className="flex flex-col items-center gap-1 text-current">
                     <div className="flex items-center gap-1">

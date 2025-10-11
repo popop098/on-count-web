@@ -16,6 +16,11 @@ const StreamerInfoCard = memo(({
     router.push(channelUrl, undefined, { shallow: true });
   };
 
+  // Ensure all required props are present
+  if (!channelName || !channelImageUrl || !channelUrl) {
+    return null;
+  }
+
   return (
     <Card className="py-4 hover:shadow-lg transition-shadow duration-200">
       <CardBody className="overflow-visible py-2 space-y-2 flex items-center justify-center w-full">
