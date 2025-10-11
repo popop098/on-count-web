@@ -146,7 +146,9 @@ export default function DarkVeil({
       
       if (w === 0 || h === 0) return;
       
-      renderer.setSize(w * resolutionScale, h * resolutionScale);
+      const rw = Math.max(1, Math.floor(w * resolutionScale));
+      const rh = Math.max(1, Math.floor(h * resolutionScale));
+      renderer.setSize(rw, rh);
       program.uniforms.uResolution.value.set(w, h);
     };
 
@@ -164,7 +166,10 @@ export default function DarkVeil({
     let lastTime = 0;
 
     const loop = (currentTime) => {
-      if (!isVisibleRef.current || !renderer || !program || !mesh) return;
+      if (!renderer || !program || !mesh) {
+        frameRef.current = requestAnimationFrame(loop);
+        return;
+      }
 
       // Throttle to 30fps for better performance
       if (currentTime - lastTime < 33) {
@@ -184,22 +189,11 @@ export default function DarkVeil({
       frameRef.current = requestAnimationFrame(loop);
     };
 
-    // Intersection Observer for visibility optimization
-    const observer = new IntersectionObserver(
-      (entries) => {
-        isVisibleRef.current = entries[0].isIntersecting;
-        if (isVisibleRef.current && !frameRef.current) {
-          frameRef.current = requestAnimationFrame(loop);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(canvas);
+    // Start loop immediately (visibility gating disabled to avoid flicker)
+    isVisibleRef.current = true;
     frameRef.current = requestAnimationFrame(loop);
 
     return () => {
-      observer.disconnect();
       clearTimeout(resizeTimeout);
       if (frameRef.current) {
         cancelAnimationFrame(frameRef.current);
