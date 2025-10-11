@@ -8,26 +8,71 @@ import { useEffect } from "react";
 import useUserStore, { useUser } from "@/store/userStore";
 import localFont from "next/font/local";
 import Image from "next/image";
-import * as ChannelService from '@channel.io/channel-web-sdk-loader';
 import OnCountLogo from "@/public/icon.png";
 import {useRouter} from "next/router";
+import dynamic from "next/dynamic";
+import PerformanceMonitor from "@/components/PerformanceMonitor";
+
 const pretendard = localFont({
   src: "../public/fonts/pretendard/PretendardVariable.woff2",
   weight: "45 920",
   variable: "--font-pretendard",
-    display: "swap",
+  display: "swap",
+  preload: true,
+  fallback: [
+    "system-ui",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "Helvetica Neue",
+    "Arial",
+    "sans-serif"
+  ],
 });
-ChannelService.loadScript()
+
+// Lazy load Channel.io only when needed
+const ChannelService = dynamic(() => import('@channel.io/channel-web-sdk-loader'), {
+  ssr: false
+});
 function MyApp({ Component, pageProps }) {
     const { setUser } = useUserStore();
   const user = useUser();
     const router = useRouter();
 
-    useEffect(()=>{
-        ChannelService.boot({
-            "pluginKey": "b5cd1ac0-3d25-4b09-bdac-70cced30c09e", // fill your plugin key
-        });
-    },[])
+    useEffect(() => {
+        // Load Channel.io only after user interaction or after a delay
+        const loadChannelIO = async () => {
+            try {
+                const ChannelService = await import('@channel.io/channel-web-sdk-loader');
+                ChannelService.loadScript();
+                ChannelService.boot({
+                    "pluginKey": "b5cd1ac0-3d25-4b09-bdac-70cced30c09e",
+                });
+            } catch (error) {
+                console.warn('Failed to load Channel.io:', error);
+            }
+        };
+
+        // Load after 3 seconds or on user interaction
+        const timer = setTimeout(loadChannelIO, 3000);
+        
+        const handleUserInteraction = () => {
+            clearTimeout(timer);
+            loadChannelIO();
+            document.removeEventListener('click', handleUserInteraction);
+            document.removeEventListener('scroll', handleUserInteraction);
+        };
+
+        document.addEventListener('click', handleUserInteraction);
+        document.addEventListener('scroll', handleUserInteraction);
+
+        return () => {
+            clearTimeout(timer);
+            document.removeEventListener('click', handleUserInteraction);
+            document.removeEventListener('scroll', handleUserInteraction);
+        };
+    }, [])
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -45,6 +90,7 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <main className={pretendard.className}>
+      <PerformanceMonitor />
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <HeroUIProvider>
           <DefaultSeo {...SEO} />
@@ -57,7 +103,14 @@ function MyApp({ Component, pageProps }) {
             <footer className="w-full flex items-center justify-center py-3">
                 <div className="flex flex-col items-center gap-1 text-current">
                     <div className="flex items-center gap-1">
-                        <Image src={OnCountLogo} alt="온카운트 로고" width={20} />
+                        <Image 
+                            src={OnCountLogo} 
+                            alt="온카운트 로고" 
+                            width={20} 
+                            height={20}
+                            priority
+                            quality={90}
+                        />
                         <p className="text-sm font-bold">온카운트</p>
                     </div>
                     <div>

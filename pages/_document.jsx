@@ -4,21 +4,46 @@ export default function Document() {
   return (
     <Html lang="ko">
         <Head>
-            <Script id="adsbygoogle-script"
-                    async
-                    strategy="afterInteractive"
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2779482138205092"
-                    crossOrigin="anonymous"></Script>
-            <Script async src="https://www.googletagmanager.com/gtag/js?id=G-PS481MY3B3"></Script>
-            <Script dangerouslySetInnerHTML={{__html:
-                `
-                window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-PS481MY3B3');
-                `
-            }}></Script>
+            {/* Preconnect to external domains for faster loading */}
+            <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
+            <link rel="preconnect" href="https://www.googletagmanager.com" />
+            <link rel="preconnect" href="https://openapi.chzzk.naver.com" />
+            
+            {/* DNS prefetch for additional performance */}
+            <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
+            <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+            <link rel="dns-prefetch" href="//openapi.chzzk.naver.com" />
+            
+            {/* Google Analytics - Load with lowest priority */}
+            <Script 
+                id="gtag-js"
+                strategy="afterInteractive"
+                src="https://www.googletagmanager.com/gtag/js?id=G-PS481MY3B3"
+            />
+            <Script 
+                id="gtag-init"
+                strategy="afterInteractive"
+                dangerouslySetInnerHTML={{
+                    __html: `
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'G-PS481MY3B3', {
+                            page_title: document.title,
+                            page_location: window.location.href
+                        });
+                    `
+                }}
+            />
+            
+            {/* Google AdSense - Load with lowest priority */}
+            <Script 
+                id="adsbygoogle-script"
+                strategy="lazyOnload"
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2779482138205092"
+                crossOrigin="anonymous"
+            />
+            
             <meta name="google-adsense-account" content="ca-pub-2779482138205092"/>
         </Head>
         <body className="antialiased">
