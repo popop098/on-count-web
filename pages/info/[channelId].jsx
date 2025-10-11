@@ -148,8 +148,12 @@ export default function StreamerPage({ channelId, channelData }) {
     swrFetcher,
     { 
       fallbackData: channelData,
-      refreshInterval: 3000, 
-      refreshWhenHidden: true 
+      refreshInterval: 5000, // Increased from 3000ms to reduce server load
+      refreshWhenHidden: false, // Disabled to save resources when tab is hidden
+      revalidateOnFocus: false,
+      dedupingInterval: 2000, // 2 seconds deduplication
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
     },
   );
   const {
@@ -423,9 +427,12 @@ export default function StreamerPage({ channelId, channelData }) {
                 <Image
                   alt={`${data?.channelName}Image`}
                   src={data?.channelImageUrl}
-                  quality={100}
-                  layout="fill"
-                  objectFit="cover"
+                  fill
+                  sizes="150px"
+                  className="object-cover"
+                  priority={true}
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                 />
               </div>
               <div className="flex flex-col items-center justify-center gap-1">
