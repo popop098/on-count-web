@@ -17,7 +17,8 @@ export default async function handler(req) {
   // Responsive channel name sizing to prevent clipping
   const nameLen = (channelName || '').length;
   const nameFontSize = nameLen > 22 ? 56 : nameLen > 16 ? 66 : nameLen > 12 ? 76 : 86;
-  const nameMaxWidth = 700; // safe width so long names wrap to two lines if needed
+  const nameMaxWidth = 720; // slightly wider safe width
+  const nameWrapped = (channelName || '').split('').join('\u200B');
 
   return new ImageResponse(
     (
@@ -51,7 +52,7 @@ export default async function handler(req) {
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <div style={{ fontSize: nameFontSize, fontWeight: 900, lineHeight: 1.12, maxWidth: nameMaxWidth, marginRight: 6, padding: '6px 10px 4px 10px', borderRadius: 8 }}>{channelName}</div>
+              <div style={{ fontSize: nameFontSize, fontWeight: 900, lineHeight: 1.18, maxWidth: nameMaxWidth, marginRight: 8, padding: '8px 12px 6px 12px', borderRadius: 8, wordBreak: 'keep-all', overflow: 'hidden' }}>{nameWrapped}</div>
               {verified && (
                 <div style={{ display: 'flex' }}>
                   <div
@@ -73,7 +74,7 @@ export default async function handler(req) {
                 </div>
               )}
             </div>
-          <div style={{ fontSize: 44, color: '#cbd5e1', marginTop: 16, fontWeight: 600, paddingLeft: 10 }}>{followerText}</div>
+            <div style={{ fontSize: 44, color: '#cbd5e1', marginTop: 16, fontWeight: 600, paddingLeft: 12 }}>{followerText}</div>
           </div>
         </div>
 
