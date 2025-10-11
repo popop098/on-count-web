@@ -16,17 +16,20 @@ const StreamerInfoCard = memo(({
     router.push(channelUrl, undefined, { shallow: true });
   };
 
-  // Ensure all required props are present
+  // Ensure all required props are present and are strings
   if (!channelName || !channelImageUrl || !channelUrl) {
     return null;
   }
+
+  // Ensure channelName is a string to prevent React error #130
+  const safeChannelName = typeof channelName === 'string' ? channelName : String(channelName || '');
 
   return (
     <Card className="py-4 hover:shadow-lg transition-shadow duration-200">
       <CardBody className="overflow-visible py-2 space-y-2 flex items-center justify-center w-full">
         <div className="w-[150px] h-[150px] rounded-full overflow-hidden relative">
           <Image
-            alt={`${channelName} 프로필 이미지`}
+            alt={`${safeChannelName} 프로필 이미지`}
             src={channelImageUrl}
             style={{ objectFit: "cover" }}
             fill
@@ -37,7 +40,7 @@ const StreamerInfoCard = memo(({
         </div>
         <CardHeader className="pb-0 pt-2 px-4 flex justify-center">
           <h4 className="font-bold text-xl truncate max-w-[200px]">
-            {channelName}
+            {safeChannelName}
             {channelVerificationMark && (
               <span className="ml-1 text-blue-500">✓</span>
             )}

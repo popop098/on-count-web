@@ -33,7 +33,12 @@ const TextType = ({
   const containerRef = useRef(null);
 
   const textArray = useMemo(
-    () => (Array.isArray(text) ? text : [text]),
+    () => {
+      if (Array.isArray(text)) {
+        return text.map(item => typeof item === 'string' ? item : String(item || ''));
+      }
+      return [typeof text === 'string' ? text : String(text || '')];
+    },
     [text],
   );
 
@@ -158,6 +163,10 @@ const TextType = ({
     hideCursorWhileTyping &&
     (currentCharIndex < textArray[currentTextIndex].length || isDeleting);
 
+  // Ensure cursorCharacter is a string to prevent React error #130
+  const safeCursorCharacter = typeof cursorCharacter === 'string' ? cursorCharacter : '|';
+  const safeDisplayedText = typeof displayedText === 'string' ? displayedText : '';
+
   return createElement(
     Component,
     {
@@ -166,14 +175,14 @@ const TextType = ({
       ...props,
     },
     <span className="inline" style={{ color: getCurrentTextColor() }}>
-      {displayedText}
+      {safeDisplayedText}
     </span>,
     showCursor ? (
       <span
         ref={cursorRef}
         className={`ml-1 inline-block opacity-100 ${shouldHideCursor ? "hidden" : ""} ${cursorClassName}`}
       >
-        {cursorCharacter}
+        {safeCursorCharacter}
       </span>
     ) : null,
   );
