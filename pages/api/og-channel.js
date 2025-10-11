@@ -3,7 +3,11 @@ import { ImageResponse } from '@vercel/og';
 export const config = {
   runtime: 'edge',
 };
-
+export const Verified = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24" {...props}>
+<path fill="#625bf5" d="m8.6 22.5l-1.9-3.2l-3.6-.8l.35-3.7L1 12l2.45-2.8l-.35-3.7l3.6-.8l1.9-3.2L12 2.95l3.4-1.45l1.9 3.2l3.6.8l-.35 3.7L23 12l-2.45 2.8l.35 3.7l-3.6.8l-1.9 3.2l-3.4-1.45l-3.4 1.45Zm2.35-6.95L16.6 9.9l-1.4-1.45l-4.25 4.25l-2.15-2.1L7.4 12l3.55 3.55Z"></path>
+</svg>
+)
 export default async function handler(req) {
   const { searchParams } = new URL(req.url);
 
@@ -18,8 +22,8 @@ export default async function handler(req) {
   const nameLen = (channelName || '').length;
   const nameFontSize = nameLen > 22 ? 56 : nameLen > 16 ? 66 : nameLen > 12 ? 76 : 86;
   const nameMaxWidth = 720; // slightly wider safe width
-  const firstLine = (channelName || '').slice(0, 5);
-  const secondLine = (channelName || '').slice(5);
+  const firstLine = (channelName || '').slice(0, 7);
+  const secondLine = (channelName || '').slice(8);
 
   return new ImageResponse(
     (
@@ -63,19 +67,11 @@ export default async function handler(req) {
                 <div style={{ display: 'flex' }}>
                   <div
                     style={{
-                      width: 40,
-                      height: 40,
                       borderRadius: 9999,
-                      background: '#3b82f6',
-                      color: '#fff',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 28,
-                      fontWeight: 900,
                     }}
                   >
-                    ✓
+                    <Verified />
                   </div>
                 </div>
               )}
