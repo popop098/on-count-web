@@ -11,8 +11,8 @@ const SEO = {
     images: [
       {
         url: 'https://on-count.kr/icon.png',
-        width: 1200,
-        height: 630,
+        width: 500,
+        height: 500,
         alt: '온카운트',
       },
     ],
