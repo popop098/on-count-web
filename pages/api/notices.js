@@ -23,25 +23,53 @@ function getCacheStore() {
   return globalThis.__onCountNoticeCache;
 }
 
+function embedToText(embed) {
+  if (!embed) return "";
+
+  const lines = [];
+  if (embed.title) lines.push(embed.title);
+  if (embed.description) lines.push(embed.description);
+
+  if (Array.isArray(embed.fields)) {
+    for (const field of embed.fields) {
+      if (field?.name) lines.push(field.name);
+      if (field?.value) lines.push(field.value);
+    }
+  }
+
+  if (embed.footer?.text) lines.push(embed.footer.text);
+  if (embed.author?.name) lines.push(embed.author.name);
+
+  return lines.join("\n").trim();
+}
+
 function parseDiscordMessage(message) {
-  const embed = Array.isArray(message.embeds) ? message.embeds[0] : null;
-  const firstLine =
-    message.content?.split("\n")?.find((line) => line?.trim()) || "";
-  const attachmentUrl =
-    Array.isArray(message.attachments) && message.attachments[0]?.url;
-  const title =
-    embed?.title || firstLine || message.author?.username || "공지사항";
-  const description =
-    embed?.description ||
-    message.content ||
-    (attachmentUrl
-      ? `첨부파일: ${attachmentUrl}`
-      : "(메시지 내용이 비어있습니다)");
+  const baseText =
+    typeof message.content === "string" ? message.content.trim() : "";
+
+  const embedText = Array.isArray(message.embeds)
+    ? message.embeds.map(embedToText).filter(Boolean).join("\n\n").trim()
+    : "";
+
+  const attachmentText = Array.isArray(message.attachments)
+    ? message.attachments
+        .map((file) => file?.url)
+        .filter(Boolean)
+        .join("\n")
+    : "";
+
+  const mergedText = [baseText, embedText, attachmentText]
+    .filter(Boolean)
+    .join("\n\n")
+    .trim();
+
+  const firstLine = mergedText.split("\n").find((line) => line.trim());
 
   return {
     id: message.id,
-    title,
-    description,
+    title: firstLine || message.author?.username || "공지사항",
+    description: mergedText || "(메시지 내용이 비어있습니다)",
+    rawText: mergedText || "(메시지 내용이 비어있습니다)",
     url: `https://discord.com/channels/${message.guild_id}/${message.channel_id}/${message.id}`,
     authorName:
       message.author?.global_name || message.author?.username || "on-count",

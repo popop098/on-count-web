@@ -117,10 +117,13 @@ export default function NoticePage() {
                       )}
                     </div>
                     <p className="text-sm text-gray-300 whitespace-pre-wrap break-words">
-                      {notice.description}
+                      {notice.rawText || notice.description}
                     </p>
                     <div className="flex items-center justify-between text-xs text-gray-400 pt-1">
-                      <span>{toDateText(notice.createdAt)}</span>
+                      <span>
+                        {toDateText(notice.createdAt)} ·{" "}
+                        {notice.authorName || "on-count"}
+                      </span>
                       <a
                         href={notice.url}
                         target="_blank"
