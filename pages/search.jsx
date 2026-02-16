@@ -1,9 +1,10 @@
-import { NextSeo } from 'next-seo';
 import { Button } from "@heroui/react";
 import buzzk from "buzzk";
 import { useRouter } from "next/router";
+import { NextSeo } from "next-seo";
 import ContainerBox from "@/components/ContainerBox";
 import { StreamerInfoCard } from "@/components/StreamerInfoCard";
+import { ensureProfilesExist } from "@/lib/profileSync";
 import OnCountLogo from "@/public/icon.png";
 
 export default function Search({ data }) {
@@ -29,8 +30,7 @@ export default function Search({ data }) {
         <div className="w-full h-[10em]" />
         <div className="w-[80%] space-y-4">
           <h1 className="text-2xl leading-tight">
-            "{searchQuery}"
-            에 대한 검색 결과입니다.
+            "{searchQuery}" 에 대한 검색 결과입니다.
           </h1>
           <Button fullWidth variant="ghost" onPress={() => router.back()}>
             이전
@@ -62,13 +62,19 @@ export default function Search({ data }) {
 export async function getServerSideProps({ query }) {
   const { q } = query;
   buzzk.login(process.env.CHZZK_NID_AUT, process.env.CHZZK_NID_SES);
+  const searchResult = Object.values((await buzzk.channel.search(q)) || {});
+
+  try {
+    await ensureProfilesExist(searchResult);
+  } catch (error) {
+    console.error("Failed to sync profiles from search page:", error);
+  }
+
   return {
     props: {
       data: {
         q,
-        searchResult: JSON.stringify(
-          Object?.values((await buzzk.channel.search(q)) || []) || [],
-        ),
+        searchResult: JSON.stringify(searchResult || []),
       },
     },
   };
