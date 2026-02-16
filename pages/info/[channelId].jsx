@@ -1,4 +1,4 @@
-import { NextSeo } from 'next-seo';
+import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import { memo, useEffect, useState } from "react";
 import useSWR from "swr";
@@ -29,6 +29,7 @@ import { Slide, toast, ToastContainer } from "react-toastify";
 import Lottie from "react-lottie-player";
 import RocketLaunch from "@/public/assets/RocketLaunch.json";
 import { supabase } from "@/lib/supabaseClient";
+import { upsertProfileSnapshot } from "@/lib/profileSync";
 
 const FollowerCount = memo(({ count }) => {
   if (count === undefined || count === null) {
@@ -148,10 +149,10 @@ export default function StreamerPage({ channelId, channelData }) {
   const { data, error, isLoading, isValidating } = useSWR(
     `/api/channel-info?mode=followers&channelid=${channelId}`,
     swrFetcher,
-    { 
+    {
       fallbackData: channelData,
-      refreshInterval: 3000, 
-      refreshWhenHidden: true 
+      refreshInterval: 3000,
+      refreshWhenHidden: true,
     },
   );
   const {
@@ -271,8 +272,8 @@ export default function StreamerPage({ channelId, channelData }) {
     }
   }, [data, count, setFollowerColor, enabledSoundEffect]);
 
-  const title = `${channelData?.channelName || '스트리머'} - 실시간 팔로워`;
-  const description = `${channelData?.channelName || '스트리머'}님의 실시간 팔로워 수를 확인하세요.`;
+  const title = `${channelData?.channelName || "스트리머"} - 실시간 팔로워`;
+  const description = `${channelData?.channelName || "스트리머"}님의 실시간 팔로워 수를 확인하세요.`;
 
   return (
     <>
@@ -286,15 +287,15 @@ export default function StreamerPage({ channelId, channelData }) {
           description: description,
           images: [
             {
-              url: `https://on-count.kr/api/og-channel?name=${encodeURIComponent(channelData?.channelName || '스트리머')}&follower=${encodeURIComponent(String(channelData?.currFollowerCount || channelData?.dbFollowerCount || channelData?.followerCount || 0))}&img=${encodeURIComponent(channelData?.channelImageUrl || 'https://on-count.kr/icon.png')}&verified=${channelData?.verifiedMark ? 'true' : 'false'}`,
+              url: `https://on-count.kr/api/og-channel?name=${encodeURIComponent(channelData?.channelName || "스트리머")}&follower=${encodeURIComponent(String(channelData?.currFollowerCount || channelData?.dbFollowerCount || channelData?.followerCount || 0))}&img=${encodeURIComponent(channelData?.channelImageUrl || "https://on-count.kr/icon.png")}&verified=${channelData?.verifiedMark ? "true" : "false"}`,
               width: 1200,
               height: 630,
-              alt: `${channelData?.channelName || '스트리머'} OG 이미지`,
+              alt: `${channelData?.channelName || "스트리머"} OG 이미지`,
             },
             // Fallback small icon for platform "icon" slot
           ],
         }}
-        twitter={{ cardType: 'summary_large_image' }}
+        twitter={{ cardType: "summary_large_image" }}
       />
       {isEnabledUpAnimation && (
         <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-20 w-96 h-96 ">
@@ -325,7 +326,9 @@ export default function StreamerPage({ channelId, channelData }) {
         <ModalContent>
           {(onClose) => (
             <>
-              {meSubscribeData?.find((item) => item.channel_id === channelId) ? (
+              {meSubscribeData?.find(
+                (item) => item.channel_id === channelId,
+              ) ? (
                 <ModalHeader className="flex items-center gap-1">
                   '{data?.channelName}'님을{" "}
                   <span className="text-warning underline underline-offset-4">
@@ -342,7 +345,9 @@ export default function StreamerPage({ channelId, channelData }) {
                   하시겠어요?
                 </ModalHeader>
               )}
-              {meSubscribeData?.find((item) => item.channel_id === channelId) ? (
+              {meSubscribeData?.find(
+                (item) => item.channel_id === channelId,
+              ) ? (
                 <ModalBody>
                   <p>
                     만약 구독 해지하실 경우 특정 팔로워 단위(예: 100명, 1000명,
@@ -542,11 +547,22 @@ export async function getServerSideProps({ params }) {
       return { notFound: true };
     }
     const channelInfo = channels.data[0];
+
+    try {
+      await upsertProfileSnapshot({
+        channel: channelInfo,
+        profile: error ? null : profile,
+      });
+    } catch (syncError) {
+      console.error("Failed to upsert channel snapshot:", syncError);
+    }
+
     if (error) {
       return { props: { channelId, channelData: channelInfo } };
     }
 
-    const { follower_count, channel_image_url, verified_mark, is_public } = profile;
+    const { follower_count, channel_image_url, verified_mark, is_public } =
+      profile;
     const { followerCount, channelName } = channelInfo;
 
     const channelData = {

@@ -1,37 +1,84 @@
-import { NextSeo } from 'next-seo';
 import { Button, Input, Spinner, Switch } from "@heroui/react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
+import { NextSeo } from "next-seo";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import ContainerBox from "@/components/ContainerBox";
 import { swrFetcher } from "@/tools/fetchTools";
-import dynamic from "next/dynamic";
 
 // Lazy load heavy components using Next.js dynamic imports
 const DarkVeil = dynamic(() => import("@/components/backgrounds/DarkVeil"), {
-  ssr: false, // Disable SSR for WebGL component
-  loading: () => <div className="w-full h-full bg-gradient-to-br from-purple-900 to-blue-900" />
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-gradient-to-br from-purple-900 to-blue-900" />
+  ),
 });
 
-const StreamerInfoCard = dynamic(() => import("@/components/StreamerInfoCard"), {
-  loading: () => <div className="w-full h-64 flex flex-col items-center justify-center"><Spinner color="primary" size="lg" /></div>
-});
+const StreamerInfoCard = dynamic(
+  () => import("@/components/StreamerInfoCard"),
+  {
+    loading: () => (
+      <div className="w-full h-64 flex flex-col items-center justify-center">
+        <Spinner color="primary" size="lg" />
+      </div>
+    ),
+  },
+);
 
 const TextType = dynamic(() => import("@/components/TextType"), {
-  loading: () => <div className="sm:text-3xl text-xl font-extrabold -my-90 z-0 text-white">로딩 중...</div>
+  loading: () => (
+    <div className="sm:text-3xl text-xl font-extrabold -my-90 z-0 text-white">
+      로딩 중...
+    </div>
+  ),
 });
+
+const StreamerSection = ({ title, description, channels, loading }) => (
+  <div className="w-[60%] mx-auto flex flex-col items-start justify-center gap-4">
+    <div className="w-full flex flex-col items-start justify-center">
+      <p className="font-extrabold text-2xl text-primary text-center w-full">
+        {title}
+      </p>
+      <p className="font-medium text-sm text-gray-500 text-center w-full">
+        {description}
+      </p>
+    </div>
+    <div className="flex flex-wrap items-center gap-1 w-full">
+      {loading ? (
+        <div className="w-full h-64 flex flex-col items-center justify-center">
+          <Spinner color="primary" size="lg" />
+        </div>
+      ) : (
+        channels?.map((item) => (
+          <StreamerInfoCard
+            key={item?.channel_id || Math.random()}
+            channelName={item?.channel_name || ""}
+            channelImageUrl={item?.channel_image_url || ""}
+            channelUrl={`/info/${item?.channel_id || ""}`}
+            channelFollwerCount={item?.follower_count || 0}
+            channelVerificationMark={item?.verified_mark || false}
+          />
+        ))
+      )}
+    </div>
+  </div>
+);
 
 export default function Index() {
   const { data, isLoading, isValidating } = useSWR(
     "/api/get-channels-data",
     swrFetcher,
-    { revalidateOnFocus: false },
+    {
+      revalidateOnFocus: false,
+    },
   );
   const [searchInput, setSearchInput] = useState("");
   const [enabledSaveSearchHistory, setEnabledSaveSearchHistory] =
     useState(undefined);
   const [searchHistory, setSearchHistory] = useState(undefined);
   const router = useRouter();
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -51,6 +98,7 @@ export default function Index() {
       });
     }
   };
+
   const handleSwitchSaveSearchHistoryOption = (e) => {
     const value = e.target.checked;
     setEnabledSaveSearchHistory(value);
@@ -60,6 +108,7 @@ export default function Index() {
     }
     localStorage.setItem("saveSearchHistory", JSON.stringify(value));
   };
+
   useEffect(() => {
     const localStorageSaveSearchHistory =
       localStorage.getItem("saveSearchHistory");
@@ -82,10 +131,11 @@ export default function Index() {
 
     setEnabledSaveSearchHistory(initialSaveHistory);
     setSearchHistory(initialSearchHistory);
-
   }, []);
-  const title = '온카운트 - 실시간 스트리머 팔로워 현황';
-  const description = '좋아하는 스트리머의 팔로워 수를 실시간으로 확인하고 검색하세요.';
+
+  const description =
+    "좋아하는 스트리머의 팔로워 수를 실시간으로 확인하고 검색하세요.";
+  const isSectionLoading = isLoading || isValidating || !data;
 
   return (
     <>
@@ -95,9 +145,16 @@ export default function Index() {
         canonical="https://on-count.kr/"
       />
       <ContainerBox>
-          <div style={{ width: "100%", height: "600px", position: "relative", overflow: "hidden" }}>
-            <DarkVeil />
-          </div>
+        <div
+          style={{
+            width: "100%",
+            height: "600px",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <DarkVeil />
+        </div>
         <TextType
           text={[
             "실시간 팔로워 현황 검색은?",
@@ -112,7 +169,7 @@ export default function Index() {
           className="sm:text-3xl text-xl font-extrabold -my-90 z-0"
           cursorClassName="text-primary"
         />
-        <div className="w-[60%] h-[22em] mx-auto flex flex-col items-center justify-center gap-4"></div>
+        <div className="w-[60%] h-[22em] mx-auto flex flex-col items-center justify-center gap-4" />
         <div className="w-[65%] h-[25em] mx-auto flex flex-col items-center justify-center gap-4 z-0">
           <p className="font-extrabold text-lg sm:text-2xl text-primary">
             검색하고 싶은 스트리머 있으신가요?
@@ -132,7 +189,6 @@ export default function Index() {
               size="sm"
               className="h-full text-xl"
               onPress={() => {
-                // 간단한 페이지 이동 로딩 UX
                 const goBtn = document.activeElement;
                 if (goBtn) {
                   goBtn.setAttribute("aria-busy", "true");
@@ -170,10 +226,10 @@ export default function Index() {
           </Switch>
           <div className="flex flex-wrap items-center justify-center gap-2 w-full">
             {searchHistory?.map((item, index) => {
-              // Ensure item is a string to prevent React error #130
-              const displayItem = typeof item === 'string' ? item : String(item || '');
+              const displayItem =
+                typeof item === "string" ? item : String(item || "");
               return (
-                <div key={`search-history-${displayItem}-${index}`} className="relative">
+                <div key={`search-history-${displayItem}`} className="relative">
                   <Button
                     size="sm"
                     onPress={() =>
@@ -187,22 +243,10 @@ export default function Index() {
                   >
                     {displayItem}
                   </Button>
-                <div
-                  role="button"
-                  tabIndex={0}
-                  className="absolute top-0 right-0 transform -translate-y-1/2 translate-x-1/2 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-white text-xs cursor-pointer"
-                  onClick={() => {
-                    const newHistory = searchHistory.filter(
-                      (_, i) => i !== index,
-                    );
-                    setSearchHistory(newHistory);
-                    localStorage.setItem(
-                      "searchHistory",
-                      JSON.stringify(newHistory),
-                    );
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
+                  <button
+                    type="button"
+                    className="absolute top-0 right-0 transform -translate-y-1/2 translate-x-1/2 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-white text-xs cursor-pointer"
+                    onClick={() => {
                       const newHistory = searchHistory.filter(
                         (_, i) => i !== index,
                       );
@@ -211,11 +255,22 @@ export default function Index() {
                         "searchHistory",
                         JSON.stringify(newHistory),
                       );
-                    }
-                  }}
-                >
-                  x
-                </div>
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        const newHistory = searchHistory.filter(
+                          (_, i) => i !== index,
+                        );
+                        setSearchHistory(newHistory);
+                        localStorage.setItem(
+                          "searchHistory",
+                          JSON.stringify(newHistory),
+                        );
+                      }
+                    }}
+                  >
+                    x
+                  </button>
                 </div>
               );
             })}
@@ -223,35 +278,31 @@ export default function Index() {
         </div>
 
         <div className="w-[60%] h-1 bg-gray-300/50 rounded-2xl" />
-        <div className="w-[60%] mx-auto flex flex-col items-start justify-center gap-4">
-          <div className="w-full flex flex-col items-start justify-center">
-            <p className="font-extrabold text-2xl text-primary text-center w-full">
-              공개 스트리머
-            </p>
-            <p className="font-medium text-sm text-gray-500 text-center w-full">
-              온-카운트내에 등록과 공개상태인 스트리머 리스트에요.
-            </p>
-          </div>
-            <div className="flex flex-wrap items-center gap-1 w-full">
-                {isLoading || isValidating || !data ? (
-                    <div className="w-full h-64 flex flex-col items-center justify-center">
-                        <Spinner color="primary" size="lg" />
-                    </div>
-                ) : (
-                    Array.isArray(data) ? data.map((item) => (
-                        <StreamerInfoCard
-                            key={item?.channel_id || Math.random()}
-                            channelName={item?.channel_name || ''}
-                            channelImageUrl={item?.channel_image_url || ''}
-                            channelUrl={`/info/${item?.channel_id || ''}`}
-                            channelFollwerCount={item?.follower_count || 0}
-                            channelVerificationMark={item?.verified_mark || false}
-                        />
-                    )) : null
-                )}
-            </div>
 
-        </div>
+        <StreamerSection
+          title="공개 스트리머"
+          description="온-카운트내에 등록과 공개상태인 스트리머 리스트에요."
+          channels={data?.publicChannels || []}
+          loading={isSectionLoading}
+        />
+
+        <div className="w-[60%] h-1 bg-gray-300/50 rounded-2xl mt-10" />
+
+        <StreamerSection
+          title="팔로워 순위"
+          description="공개 여부와 관계없이 데이터베이스에 저장된 채널의 팔로워 순위를 보여줘요."
+          channels={data?.followerRanking || []}
+          loading={isSectionLoading}
+        />
+
+        <div className="w-[60%] h-1 bg-gray-300/50 rounded-2xl mt-10" />
+
+        <StreamerSection
+          title="최근 조회된 채널"
+          description="최근 검색/접근 과정에서 저장되거나 갱신된 채널을 보여줘요."
+          channels={data?.recentViewedChannels || []}
+          loading={isSectionLoading}
+        />
       </ContainerBox>
     </>
   );
