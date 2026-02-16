@@ -50,11 +50,11 @@ export default function NoticePage() {
       />
       <ContainerBox>
         <div className="w-full h-[8em]" />
-        <div className="w-[90%] max-w-4xl space-y-4 pb-16">
+        <div className="w-[94%] sm:w-[90%] max-w-4xl space-y-4 pb-16">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-bold">공지사항</h1>
-              <p className="text-sm text-gray-400">
+              <h1 className="text-xl sm:text-2xl font-bold">공지사항</h1>
+              <p className="text-xs sm:text-sm text-gray-400">
                 Discord 공지채널 연동 · 1분 캐시 갱신
               </p>
             </div>
@@ -107,7 +107,7 @@ export default function NoticePage() {
                 >
                   <CardBody className="space-y-2">
                     <div className="flex items-start justify-between gap-3">
-                      <h2 className="text-lg font-semibold whitespace-pre-wrap break-words">
+                      <h2 className="text-base sm:text-lg font-semibold whitespace-pre-wrap break-words">
                         {notice.title}
                       </h2>
                       {notice.pinned && (
@@ -116,10 +116,10 @@ export default function NoticePage() {
                         </Chip>
                       )}
                     </div>
-                    <p className="text-sm text-gray-300 whitespace-pre-wrap break-words">
+                    <p className="text-xs sm:text-sm text-gray-300 whitespace-pre-wrap break-words">
                       {notice.rawText || notice.description}
                     </p>
-                    <div className="flex items-center justify-between text-xs text-gray-400 pt-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-gray-400 pt-1">
                       <span>
                         {toDateText(notice.createdAt)} ·{" "}
                         {notice.authorName || "on-count"}

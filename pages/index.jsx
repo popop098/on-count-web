@@ -35,16 +35,16 @@ const TextType = dynamic(() => import("@/components/TextType"), {
 });
 
 const StreamerSection = ({ title, description, channels, loading }) => (
-  <div className="w-[60%] mx-auto flex flex-col items-start justify-center gap-4">
+  <div className="w-[92%] sm:w-[85%] lg:w-[60%] mx-auto flex flex-col items-start justify-center gap-4">
     <div className="w-full flex flex-col items-start justify-center">
-      <p className="font-extrabold text-2xl text-primary text-center w-full">
+      <p className="font-extrabold text-xl sm:text-2xl text-primary text-center w-full">
         {title}
       </p>
-      <p className="font-medium text-sm text-gray-500 text-center w-full">
+      <p className="font-medium text-xs sm:text-sm text-gray-500 text-center w-full">
         {description}
       </p>
     </div>
-    <div className="flex flex-wrap items-center gap-1 w-full">
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 w-full">
       {loading ? (
         <div className="w-full h-64 flex flex-col items-center justify-center">
           <Spinner color="primary" size="lg" />
@@ -169,8 +169,8 @@ export default function Index() {
           className="sm:text-3xl text-xl font-extrabold -my-90 z-0"
           cursorClassName="text-primary"
         />
-        <div className="w-[60%] h-[22em] mx-auto flex flex-col items-center justify-center gap-4" />
-        <div className="w-[65%] h-[25em] mx-auto flex flex-col items-center justify-center gap-4 z-0">
+        <div className="w-[92%] sm:w-[65%] h-[16em] sm:h-[22em] mx-auto flex flex-col items-center justify-center gap-4" />
+        <div className="w-[92%] sm:w-[80%] lg:w-[65%] h-[22em] sm:h-[25em] mx-auto flex flex-col items-center justify-center gap-4 z-0">
           <p className="font-extrabold text-lg sm:text-2xl text-primary">
             검색하고 싶은 스트리머 있으신가요?
           </p>
@@ -179,7 +179,7 @@ export default function Index() {
               label="스트리머 검색하기"
               variant="flat"
               color="primary"
-              className="font-extrabold sm:w-[60%]"
+              className="font-extrabold w-full sm:w-[60%]"
               type="search"
               value={searchInput}
               onValueChange={setSearchInput}
@@ -277,7 +277,7 @@ export default function Index() {
           </div>
         </div>
 
-        <div className="w-[60%] h-1 bg-gray-300/50 rounded-2xl" />
+        <div className="w-[92%] sm:w-[60%] h-1 bg-gray-300/50 rounded-2xl" />
 
         <StreamerSection
           title="공개 스트리머"
@@ -286,7 +286,7 @@ export default function Index() {
           loading={isSectionLoading}
         />
 
-        <div className="w-[60%] h-1 bg-gray-300/50 rounded-2xl mt-10" />
+        <div className="w-[92%] sm:w-[60%] h-1 bg-gray-300/50 rounded-2xl mt-10" />
 
         <StreamerSection
           title="팔로워 순위"
@@ -295,7 +295,7 @@ export default function Index() {
           loading={isSectionLoading}
         />
 
-        <div className="w-[60%] h-1 bg-gray-300/50 rounded-2xl mt-10" />
+        <div className="w-[92%] sm:w-[60%] h-1 bg-gray-300/50 rounded-2xl mt-10" />
 
         <StreamerSection
           title="최근 조회된 채널"

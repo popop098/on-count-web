@@ -2,13 +2,15 @@
 
 import { supabase } from "@/lib/supabaseClient";
 import { getAccessToken, getMeInfo, getChannelsInfo } from "@/tools/fetchTools";
-import { serialize } from "cookie";
+import { parse, serialize } from "cookie";
 
 export default async function handler(req, res) {
   const { code, state } = req.query;
+  const cookies = parse(req.headers.cookie || "");
+  const oauthState = cookies.oauthState;
 
-  if (!code) {
-    return res.status(400).send("Authorization code is missing.");
+  if (!code || !state || !oauthState || state !== oauthState) {
+    return res.status(400).send("Invalid or missing OAuth state/code.");
   }
 
   try {
@@ -85,6 +87,7 @@ export default async function handler(req, res) {
     const accessTokenCookie = serialize("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
       path: "/",
       maxAge: expiresIn,
     });
@@ -92,20 +95,30 @@ export default async function handler(req, res) {
     const refreshTokenCookie = serialize("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
     const userIdCookie = serialize("userId", channelId, {
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
+    });
+    const oauthStateCookie = serialize("oauthState", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
+      path: "/",
+      maxAge: -1,
     });
 
     res.setHeader("Set-Cookie", [
       accessTokenCookie,
       refreshTokenCookie,
       userIdCookie,
+      oauthStateCookie,
     ]);
     res.redirect("/");
   } catch (error) {

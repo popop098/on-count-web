@@ -28,8 +28,8 @@ export default function Search({ data }) {
       />
       <ContainerBox>
         <div className="w-full h-[10em]" />
-        <div className="w-[80%] space-y-4">
-          <h1 className="text-2xl leading-tight">
+        <div className="w-[92%] sm:w-[80%] space-y-4">
+          <h1 className="text-xl sm:text-2xl leading-tight">
             "{searchQuery}" 에 대한 검색 결과입니다.
           </h1>
           <Button fullWidth variant="ghost" onPress={() => router.back()}>
@@ -37,7 +37,7 @@ export default function Search({ data }) {
           </Button>
           <div className="w-full h-1 bg-gray-600 rounded-xl" />
           {searchResult.length > 0 ? (
-            <div className="w-full flex flex-wrap items-center gap-2">
+            <div className="w-full grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               {searchResult.map((item) => (
                 <StreamerInfoCard
                   key={item.channelID}

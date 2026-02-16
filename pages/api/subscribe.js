@@ -2,18 +2,39 @@ import { supabase } from "@/lib/supabaseClient";
 import { getChannelsInfo } from "@/tools/fetchTools";
 export default async function handler(req, res) {
   const { method } = req;
-  const { fcm_token, channel_id, user_id, topic } = req.body;
+  const { fcm_token, channel_id, topic } = req.body || {};
   const { need_more_info } = req.query;
+  const curr_user_id = req.cookies.userId;
+
+  const isInvalidTopic =
+    typeof topic !== "string" || topic.length < 1 || topic.length > 120;
+  const isInvalidChannelId =
+    typeof channel_id !== "string" || channel_id.length < 1 || channel_id.length > 100;
+
   try {
     if (method === "POST") {
+      if (!curr_user_id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      if (isInvalidTopic || isInvalidChannelId || typeof fcm_token !== "string") {
+        return res.status(400).json({ message: "Invalid request payload" });
+      }
+
       const { error } = await supabase.from("subscribes").insert({
         fcm_token: fcm_token,
         channel_id: channel_id,
-        user_id: user_id,
+        user_id: curr_user_id,
         topic: topic,
       });
       return res.status(200).json(error);
     } else if (method === "DELETE") {
+      if (!curr_user_id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      if (isInvalidTopic || isInvalidChannelId) {
+        return res.status(400).json({ message: "Invalid request payload" });
+      }
+
       // const {error:getDataErr, data} = await supabase.from("subscribes").select("*").eq("topic",topic)
       // let id;
       // if(getDataErr) {
@@ -23,14 +44,13 @@ export default async function handler(req, res) {
       const deleteDataErr = await supabase
         .from("subscribes")
         .delete()
-        .match({ channel_id: channel_id, user_id: user_id, topic: topic });
+        .match({ channel_id: channel_id, user_id: curr_user_id, topic: topic });
       if (deleteDataErr.status !== 204) {
         console.error(deleteDataErr);
         return res.status(400).json(deleteDataErr);
       }
       return res.status(200).json({});
     } else if (method === "GET") {
-      const curr_user_id = req.cookies.userId;
       if (!curr_user_id) {
         return res.status(401).json({});
       }
@@ -38,7 +58,6 @@ export default async function handler(req, res) {
         .from("subscribes")
         .select("channel_id, user_id, id")
         .eq("user_id", curr_user_id);
-      console.log(subscribedError);
       if (subscribedError) {
         return res.status(400).json(subscribedError);
       }
@@ -51,6 +70,7 @@ export default async function handler(req, res) {
       }
       return res.status(200).json(subscribedData);
     }
+    return res.status(405).json({ message: "Method Not Allowed" });
   } catch (error) {
     console.error(error);
     return res.status(400).json(error);

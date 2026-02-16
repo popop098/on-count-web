@@ -35,7 +35,23 @@ const sendFCMNotification = async (data, tokenList) => {
 const handler = async (req, res) => {
   if (req.method === "POST") {
     try {
+      const adminSecret = process.env.INTERNAL_API_SECRET;
+      const requestSecret = req.headers["x-internal-api-secret"];
+
+      if (!adminSecret || requestSecret !== adminSecret) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
       const { message, tokenList } = req.body;
+
+      if (!Array.isArray(tokenList) || tokenList.length === 0) {
+        return res.status(400).json({ error: "tokenList is required" });
+      }
+
+      if (tokenList.length > 500) {
+        return res.status(400).json({ error: "tokenList exceeds limit" });
+      }
+
       const result = await sendFCMNotification(message, tokenList);
       return res.status(200).json({ result });
     } catch (error) {

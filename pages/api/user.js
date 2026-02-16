@@ -41,7 +41,6 @@ export default async function handler(req, res) {
         .status(404)
         .json({ message: "User profile not found in our database." });
     }
-    console.log(profile);
     const reformatData = {
       channelId: profile.channel_id,
       channelName: profile.channel_name,
