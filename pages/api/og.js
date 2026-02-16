@@ -1,49 +1,43 @@
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from "@vercel/og";
 
 export const config = {
-    runtime: 'edge',
+  runtime: "edge",
 };
 
 export default async function handler(req) {
   const { searchParams } = new URL(req.url);
-
-  const title = searchParams.get('title') || '온카운트';
-  const description = searchParams.get('description') || '실시간 스트리머 팔로워 현황';
+  const title = searchParams.get("title") || "On-Count";
+  const description =
+    searchParams.get("description") || "Real-time streamer follower tracking";
 
   return new ImageResponse(
-    (
-      <div
-        style={{
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#1a1a1a',
-          color: 'white',
-          fontFamily: 'Pretendard',
-          padding: '40px',
-        }}
-      >
-        <div style={{ fontSize: 60, fontWeight: 700, marginBottom: 20 }}>{title}</div>
-        <div style={{ fontSize: 30, fontWeight: 400, color: '#cccccc' }}>{description}</div>
-        <div style={{
-          position: 'absolute',
-          bottom: 40,
-          right: 40,
-          display: 'flex',
-          alignItems: 'center',
-          fontSize: 24,
-          color: '#cccccc'
-        }}>
-          <span style={{ fontWeight: 600 }}>온카운트</span> | on-count.kr
-        </div>
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        backgroundColor: "#111827",
+        color: "#ffffff",
+        padding: "64px",
+      }}
+    >
+      <div style={{ fontSize: 72, fontWeight: 800, marginBottom: 18 }}>
+        {title}
       </div>
-    ),
+      <div style={{ fontSize: 34, color: "#d1d5db" }}>{description}</div>
+      <div style={{ marginTop: 30, fontSize: 24, color: "#93c5fd" }}>
+        on-count.kr
+      </div>
+    </div>,
     {
       width: 1200,
       height: 630,
+      headers: {
+        "cache-control":
+          "public, max-age=31536000, s-maxage=31536000, immutable",
+      },
     },
   );
 }
