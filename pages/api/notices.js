@@ -3,6 +3,9 @@ const DEFAULT_LIMIT = 15;
 const CACHE_TTL_MS = 60 * 1000;
 const STALE_TTL_MS = 10 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 8 * 1000;
+const DEFAULT_SUPPORT_SERVER_ID = "1425092871752519873";
+const DEFAULT_NOTICE_CHANNEL_ID = "1425092873170190438";
+const DEFAULT_FOLLOW_URL = "https://discord.gg/p2UnyUXU7P";
 
 function getCacheStore() {
   if (!globalThis.__onCountNoticeCache) {
@@ -24,8 +27,16 @@ function parseDiscordMessage(message) {
   const embed = Array.isArray(message.embeds) ? message.embeds[0] : null;
   const firstLine =
     message.content?.split("\n")?.find((line) => line?.trim()) || "";
-  const title = embed?.title || firstLine || "공지사항";
-  const description = embed?.description || message.content || "";
+  const attachmentUrl =
+    Array.isArray(message.attachments) && message.attachments[0]?.url;
+  const title =
+    embed?.title || firstLine || message.author?.username || "공지사항";
+  const description =
+    embed?.description ||
+    message.content ||
+    (attachmentUrl
+      ? `첨부파일: ${attachmentUrl}`
+      : "(메시지 내용이 비어있습니다)");
 
   return {
     id: message.id,
@@ -36,6 +47,7 @@ function parseDiscordMessage(message) {
       message.author?.global_name || message.author?.username || "on-count",
     createdAt: message.timestamp,
     pinned: Boolean(message.pinned),
+    messageType: message.type,
   };
 }
 
@@ -53,13 +65,7 @@ async function fetchWithTimeout(url, options, timeoutMs) {
   }
 }
 
-async function fetchNoticesFromDiscord({
-  token,
-  serverId,
-  channelId,
-  limit,
-  cache,
-}) {
+async function fetchNoticesFromDiscord({ token, channelId, limit, cache }) {
   const headers = {
     Authorization: `Bot ${token}`,
     "Content-Type": "application/json",
@@ -99,17 +105,15 @@ async function fetchNoticesFromDiscord({
   }
 
   if (!resp.ok) {
-    throw new Error(`Discord API request failed with status ${resp.status}`);
+    const discordError = await resp.text().catch(() => "");
+    throw new Error(
+      `Discord API request failed with status ${resp.status}: ${discordError}`,
+    );
   }
 
   const messages = await resp.json();
   const notices = Array.isArray(messages)
-    ? messages
-        .filter(
-          (msg) => msg.guild_id === serverId && msg.channel_id === channelId,
-        )
-        .map(parseDiscordMessage)
-        .filter((item) => item.description?.trim())
+    ? messages.map(parseDiscordMessage).filter((item) => item.id)
     : [];
 
   cache.data = notices;
@@ -122,13 +126,7 @@ async function fetchNoticesFromDiscord({
   return { status: "updated", notices };
 }
 
-async function fetchNoticesWithDedup({
-  token,
-  serverId,
-  channelId,
-  limit,
-  cache,
-}) {
+async function fetchNoticesWithDedup({ token, channelId, limit, cache }) {
   const now = Date.now();
   if (
     cache.inflightPromise &&
@@ -140,7 +138,6 @@ async function fetchNoticesWithDedup({
   cache.inflightStartedAt = now;
   cache.inflightPromise = fetchNoticesFromDiscord({
     token,
-    serverId,
     channelId,
     limit,
     cache,
@@ -158,18 +155,21 @@ export default async function handler(req, res) {
 
   const discordBotToken = process.env.DISCORD_BOT_TOKEN;
   const supportServerId =
-    process.env.DISCORD_SUPPORT_SERVER_ID || "1425092871752519873";
+    process.env.DISCORD_SUPPORT_SERVER_ID || DEFAULT_SUPPORT_SERVER_ID;
   const noticeChannelId =
-    process.env.DISCORD_NOTICE_CHANNEL_ID || "1425092873170190438";
+    process.env.DISCORD_NOTICE_CHANNEL_ID || DEFAULT_NOTICE_CHANNEL_ID;
+  const followUrl = process.env.DISCORD_FOLLOW_URL || DEFAULT_FOLLOW_URL;
   const limit = Math.max(
     1,
     Math.min(Number(req.query.limit || DEFAULT_LIMIT), 50),
   );
 
   if (!discordBotToken) {
-    return res
-      .status(503)
-      .json({ message: "DISCORD_BOT_TOKEN is not configured." });
+    return res.status(503).json({
+      message: "DISCORD_BOT_TOKEN is not configured.",
+      followUrl,
+      notices: [],
+    });
   }
 
   const cache = getCacheStore();
@@ -184,7 +184,7 @@ export default async function handler(req, res) {
       return res.status(200).json({
         serverId: supportServerId,
         channelId: noticeChannelId,
-        followUrl: `https://discord.com/channels/${supportServerId}/${noticeChannelId}`,
+        followUrl,
         source: "memory-cache",
         updatedAt: cache.updatedAt,
         notices: cache.data,
@@ -193,7 +193,6 @@ export default async function handler(req, res) {
 
     const result = await fetchNoticesWithDedup({
       token: discordBotToken,
-      serverId: supportServerId,
       channelId: noticeChannelId,
       limit,
       cache,
@@ -206,7 +205,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       serverId: supportServerId,
       channelId: noticeChannelId,
-      followUrl: `https://discord.com/channels/${supportServerId}/${noticeChannelId}`,
+      followUrl,
       source: result.status,
       updatedAt: cache.updatedAt,
       notices: result.notices,
@@ -220,7 +219,7 @@ export default async function handler(req, res) {
       return res.status(200).json({
         serverId: supportServerId,
         channelId: noticeChannelId,
-        followUrl: `https://discord.com/channels/${supportServerId}/${noticeChannelId}`,
+        followUrl,
         source: "stale-fallback",
         updatedAt: cache.updatedAt,
         notices: cache.data,
@@ -230,6 +229,8 @@ export default async function handler(req, res) {
     return res.status(500).json({
       message: "Failed to load notices from Discord.",
       error: error instanceof Error ? error.message : "Unknown error",
+      followUrl,
+      notices: [],
     });
   }
 }

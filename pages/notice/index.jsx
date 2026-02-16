@@ -4,8 +4,7 @@ import useSWR from "swr";
 import ContainerBox from "@/components/ContainerBox";
 import { swrFetcher } from "@/tools/fetchTools";
 
-const SUPPORT_SERVER_ID = "1425092871752519873";
-const NOTICE_CHANNEL_ID = "1425092873170190438";
+const DEFAULT_FOLLOW_URL = "https://discord.gg/p2UnyUXU7P";
 
 const toDateText = (value) => {
   if (!value) return "";
@@ -35,9 +34,7 @@ export default function NoticePage() {
   );
 
   const notices = data?.notices || [];
-  const followUrl =
-    data?.followUrl ||
-    `https://discord.com/channels/${SUPPORT_SERVER_ID}/${NOTICE_CHANNEL_ID}`;
+  const followUrl = data?.followUrl || DEFAULT_FOLLOW_URL;
 
   return (
     <>
@@ -86,7 +83,9 @@ export default function NoticePage() {
                 공지사항을 불러오지 못했습니다.
               </p>
               <p className="text-sm text-gray-400">
-                잠시 후 다시 시도해주세요.
+                {typeof error?.message === "string"
+                  ? error.message
+                  : "잠시 후 다시 시도해주세요."}
               </p>
             </div>
           )}

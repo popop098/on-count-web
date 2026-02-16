@@ -84,6 +84,9 @@ DISCORD_BOT_TOKEN=
 # 미설정 시 기본값: 1425092871752519873 / 1425092873170190438
 DISCORD_SUPPORT_SERVER_ID=
 DISCORD_NOTICE_CHANNEL_ID=
+
+# (선택) 공식 서버 팔로우 버튼 이동 링크 (기본값: https://discord.gg/p2UnyUXU7P)
+DISCORD_FOLLOW_URL=
 ```
 
 ## ⚠️ 주의사항 ️⚠️
