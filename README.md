@@ -76,6 +76,14 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # 치지직 애플리케이션에 등록한 '로그인 리디렉션 URL'과 반드시 일치해야 합니다.
 CHZZK_REDIRECT_URI=http://localhost:3000/api/auth/callback
+
+# Discord 공지사항 연동용 Bot Token (서버 전용, 절대 외부 공유 금지)
+DISCORD_BOT_TOKEN=
+
+# (선택) 공지 서버/채널 ID를 변경할 때만 설정하세요.
+# 미설정 시 기본값: 1425092871752519873 / 1425092873170190438
+DISCORD_SUPPORT_SERVER_ID=
+DISCORD_NOTICE_CHANNEL_ID=
 ```
 
 ## ⚠️ 주의사항 ️⚠️
