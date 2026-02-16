@@ -1,35 +1,38 @@
-import { useState } from "react";
-import { usePathname } from "next/navigation";
-import Image from "next/image";
 import {
+  Avatar,
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownSection,
+  DropdownTrigger,
+  Link,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Navbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  Link,
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Dropdown,
-  DropdownTrigger,
-  Avatar,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-  NavbarMenuToggle,
   NavbarMenu,
   NavbarMenuItem,
+  NavbarMenuToggle,
+  useDisclosure,
 } from "@heroui/react";
-import OnCountLogo from "@/public/icon.png";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import ChzzkLogo from "@/public/chzzk_Icon_02.png";
+import OnCountLogo from "@/public/icon.png";
 import { useUser } from "@/store/userStore";
-import {useRouter} from "next/router";
 
-const menuItems = [{ name: "메인", href: "/" }];
+const menuItems = [
+  { name: "메인", href: "/" },
+  { name: "공지", href: "/notice" },
+];
 
 export const NavBarComp = () => {
   const {
@@ -40,7 +43,7 @@ export const NavBarComp = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [isSigninBtnLoading, setIsSigninBtnLoading] = useState(false);
-  const [isMenuOpen, _setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useUser();
 
   const handleSigninBtn = async () => {
@@ -93,7 +96,8 @@ export const NavBarComp = () => {
       </Modal>
       <Navbar
         isBordered
-        className="w-[80%] fixed mx-auto mt-5 rounded-3xl h-fit"
+        onMenuOpenChange={setIsMenuOpen}
+        className="w-[94%] sm:w-[80%] fixed mx-auto mt-3 sm:mt-5 rounded-3xl h-fit"
       >
         <NavbarContent>
           <NavbarMenuToggle
@@ -107,7 +111,7 @@ export const NavBarComp = () => {
               width={50}
               height={50}
               className="rounded-xl"
-              onClick={()=>router.push('/')}
+              onClick={() => router.push("/")}
             />
           </NavbarBrand>
         </NavbarContent>
@@ -198,6 +202,36 @@ export const NavBarComp = () => {
               </NavbarMenuItem>
             );
           })}
+          {user && (
+            <NavbarMenuItem isActive={pathname === "/me"}>
+              <Link
+                className="w-full text-3xl underline underline-offset-8"
+                href="/me"
+                size="lg"
+                color={pathname === "/me" ? "primary" : "foreground"}
+              >
+                프로필
+              </Link>
+            </NavbarMenuItem>
+          )}
+          {user ? (
+            <NavbarMenuItem>
+              <Button
+                color="danger"
+                variant="flat"
+                className="font-semibold"
+                onPress={handleSignoutBtn}
+              >
+                로그아웃
+              </Button>
+            </NavbarMenuItem>
+          ) : (
+            <NavbarMenuItem>
+              <Button color="primary" onPress={signinModalOnOpen}>
+                들어가기
+              </Button>
+            </NavbarMenuItem>
+          )}
         </NavbarMenu>
       </Navbar>
     </>
