@@ -1,5 +1,6 @@
 import { Button, Input, Spinner, Switch } from "@heroui/react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import { useEffect, useState } from "react";
@@ -276,6 +277,30 @@ export default function Index() {
             })}
           </div>
         </div>
+
+        <section className="w-[92%] sm:w-[80%] lg:w-[65%] mx-auto flex flex-col items-center gap-3 py-6 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-primary">온-카운트 고정 안내 페이지</h2>
+          <p className="text-xs sm:text-sm text-gray-500">
+            서비스 설명, 데이터 수집 기준, 갱신 주기, 활용 가치를 정리한 문서를 통해 온-카운트를 더 깊게 이해해보세요.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link href="/about" className="underline underline-offset-4 text-primary">
+              서비스 소개
+            </Link>
+            <Link
+              href="/guide/adsense-safe-content"
+              className="underline underline-offset-4 text-primary"
+            >
+              애드센스 안전 콘텐츠 가이드
+            </Link>
+            <Link
+              href="/guide/follower-trends"
+              className="underline underline-offset-4 text-primary"
+            >
+              팔로워 추이 해석 가이드
+            </Link>
+          </div>
+        </section>
 
         <div className="w-[92%] sm:w-[60%] h-1 bg-gray-300/50 rounded-2xl" />
 

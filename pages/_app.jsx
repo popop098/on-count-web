@@ -174,6 +174,31 @@ function MyApp({ Component, pageProps }) {
                             </button>
                         </p>
                     </div>
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                        <button
+                            type="button"
+                            className="text-sm text-gray-500 hover:underline hover:decoration-blue-600 hover:text-blue-600"
+                            onClick={() => router.push('/about')}
+                        >
+                            서비스 소개
+                        </button>
+                        <div className="h-1 w-1 bg-gray-300/50 rounded-2xl"/>
+                        <button
+                            type="button"
+                            className="text-sm text-gray-500 hover:underline hover:decoration-blue-600 hover:text-blue-600"
+                            onClick={() => router.push('/guide/adsense-safe-content')}
+                        >
+                            애드센스 안전 콘텐츠
+                        </button>
+                        <div className="h-1 w-1 bg-gray-300/50 rounded-2xl"/>
+                        <button
+                            type="button"
+                            className="text-sm text-gray-500 hover:underline hover:decoration-blue-600 hover:text-blue-600"
+                            onClick={() => router.push('/guide/follower-trends')}
+                        >
+                            팔로워 추이 가이드
+                        </button>
+                    </div>
                 </div>
             </footer>
 
