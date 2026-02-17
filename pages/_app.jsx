@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import useUserStore, { useUser } from "@/store/userStore";
 import localFont from "next/font/local";
 import Image from "next/image";
+import Link from "next/link";
 import OnCountLogo from "@/public/icon.png";
 import {useRouter} from "next/router";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
@@ -144,34 +145,33 @@ function MyApp({ Component, pageProps }) {
                     <div>
                         <p className="text-sm text-gray-500">
                             Powered by{" "}
-                            <button
-                                type="button"
+                            <a
+                                href="https://eliv.kr/"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="hover:underline hover:decoration-blue-600 hover:cursor-pointer hover:text-blue-600"
-                                onClick={() => window.open("https://eliv.kr/", "_blank")}
                             >
                                 PROJECT ELIV(도메인 제공)
-                            </button>
+                            </a>
                         </p>
                     </div>
                     <div className="flex items-center justify-center gap-1">
                         <p className="text-sm text-gray-500">
-                            <button
-                                type="button"
+                            <Link
+                                href="/privacy"
                                 className="hover:underline hover:decoration-blue-600 hover:cursor-pointer hover:text-blue-600"
-                                onClick={()=>router.push('/privacy')}
                             >
                                 개인정보처리방침
-                            </button>
+                            </Link>
                         </p>
                         <div className="h-1 w-1 bg-gray-300/50 rounded-2xl"/>
                         <p className="text-sm text-gray-500">
-                            <button
-                                type="button"
+                            <Link
+                                href="/terms"
                                 className="hover:underline hover:decoration-blue-600 hover:cursor-pointer hover:text-blue-600"
-                                onClick={()=>router.push('/terms')}
                             >
                                 서비스 이용약관
-                            </button>
+                            </Link>
                         </p>
                     </div>
                 </div>
