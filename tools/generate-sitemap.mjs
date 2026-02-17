@@ -5,25 +5,34 @@ const generateSitemap = async () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  const staticPages = [
+    "/",
+    "/notice",
+    "/privacy",
+    "/terms",
+    "/about",
+    "/guide",
+  ];
+
+  const dynamicPages = [];
+
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error("Supabase environment variables are not set.");
-    return;
+    console.warn(
+      "Supabase environment variables are not set. Generating sitemap with static pages only.",
+    );
+  } else {
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const { data: profiles, error } = await supabase
+      .from("profiles")
+      .select("id");
+
+    if (error) {
+      console.error("Error fetching profiles:", error);
+      return;
+    }
+
+    dynamicPages.push(...profiles.map((profile) => `/info/${profile.id}`));
   }
-
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-  const staticPages = ["/", "/notice"];
-
-  const { data: profiles, error } = await supabase
-    .from("profiles")
-    .select("id");
-
-  if (error) {
-    console.error("Error fetching profiles:", error);
-    return;
-  }
-
-  const dynamicPages = profiles.map((profile) => `/info/${profile.id}`);
 
   const allPages = [...staticPages, ...dynamicPages];
 
