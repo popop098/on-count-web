@@ -31,6 +31,8 @@ import { useUser } from "@/store/userStore";
 
 const menuItems = [
   { name: "메인", href: "/" },
+  { name: "서비스 소개", href: "/about" },
+  { name: "팔로워 가이드", href: "/guide/follower-trends" },
   { name: "공지", href: "/notice" },
 ];
 

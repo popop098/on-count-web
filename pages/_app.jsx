@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import useUserStore, { useUser } from "@/store/userStore";
 import localFont from "next/font/local";
 import Image from "next/image";
+import Link from "next/link";
 import OnCountLogo from "@/public/icon.png";
 import { useRouter } from "next/router";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
